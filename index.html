@@ -75,7 +75,7 @@
             background: var(--bg-color);
             margin: 0;
             padding: 12px;
-            padding-bottom: 40px;
+            padding-bottom: 70px;
             transition: background 0.3s ease, color 0.2s ease;
         }
         
@@ -386,11 +386,22 @@
             left: 0;
             width: 100%;
             background: var(--footer-bg);
-            padding: 8px 10px;
+            padding: 10px 12px;
             text-align: center;
             border-top: 1px solid var(--border-color);
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-muted);
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 -2px 8px var(--shadow);
+        }
+        .footer a {
+            display: inline-block;
+            padding: 4px 6px;
+            margin-left: 4px;
+            touch-action: manipulation;
+            color: var(--text-secondary);
+            text-decoration: underline;
         }
         .last-update {
             font-size: 10px;
@@ -501,7 +512,7 @@
             color: var(--text-muted);
         }
         
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             .title-row {
                 margin-bottom: 2px;
             }
@@ -516,7 +527,20 @@
                 padding: 12px;
             }
         }
-        
+
+    /* Планшеты */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            body {
+                padding-bottom: 85px;
+            }
+            .footer {
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+            .footer a {
+                padding: 6px 8px;
+            }
+        }   
         @media (max-width: 500px) {
             button {
                 width: 48px;
