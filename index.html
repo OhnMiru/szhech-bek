@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>🍌 Бананчики 🍌</title>
+    <title>🍌 Бананчики — учёт мерча</title>
     <style>
         * {
             box-sizing: border-box;
@@ -470,9 +470,9 @@
             padding-right: 40px;
         }
         .modal-close-btn {
-            position: sticky;
-            top: 16px;
-            float: right;
+            position: absolute;
+            top: 20px;
+            right: 20px;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 30px;
@@ -486,13 +486,6 @@
             align-items: center;
             justify-content: center;
             z-index: 1100;
-            margin-bottom: 10px;
-        }
-        /* Для очистки float */
-        .modal-content:after {
-            content: "";
-            display: table;
-            clear: both;
         }
         
         .history-item { 
@@ -716,6 +709,7 @@
             .cart-qty-badge { top: 4px; right: 8px; font-size: 10px; padding: 1px 6px; }
             .price-step-btn { width: 38px; height: 38px; font-size: 16px; }
             .modal-content { width: calc(100% - 30px); margin: 15px auto; }
+            .modal-close-btn { top: 12px; right: 12px; width: 32px; height: 32px; font-size: 18px; }
         }
     </style>
 </head>
@@ -882,7 +876,6 @@
                 type: type // 'basket' - массовая продажа, 'single' - одиночная
             };
             salesHistory.unshift(entry); // новые записи сверху
-            // Ограничим историю 100 записями
             if (salesHistory.length > 100) salesHistory = salesHistory.slice(0, 100);
             saveHistory();
         }
@@ -1422,7 +1415,6 @@
             } catch (error) { console.error(error); if (!silent) { await loadData(true, true); showToast("Ошибка соединения", false); } }
             updateCartBadges();
             
-            // Если это одиночная продажа (delta = -1), добавляем в историю
             if (!silent && delta === -1) {
                 addSingleSaleToHistory(card.name, 1, card.price);
             }
@@ -1453,7 +1445,6 @@
                 showToast(rulesMessage, true);
             }
             
-            // Сохраняем в историю
             const historyItems = items.map(([idxStr, qty]) => {
                 const idx = parseInt(idxStr);
                 const card = originalCardsData[idx];
