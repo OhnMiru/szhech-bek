@@ -800,6 +800,7 @@
         
         <div style="display: flex; gap: 10px; margin-bottom: 12px;">
             <button class="refresh-btn" onclick="loadData(true, true)">🔄 Обновить</button>
+            <button class="refresh-btn" onclick="openRulesModal()" style="background: var(--btn-bg);">📋 Правила</button>
             <button class="history-btn" onclick="showHistory()">📜 История</button>
         </div>
         
@@ -856,6 +857,26 @@
         </div>
     </div>
 
+    <!-- Модалка правил -->
+    <div id="rulesModal" class="modal">
+        <div class="modal-content" style="max-width: 500px; margin: 20px auto;">
+            <div class="modal-header">
+                <span>📋 Правила для продавца</span>
+                <button class="close-btn" onclick="closeRulesModal()">×</button>
+            </div>
+            <div id="rules-list" style="max-height: 400px; overflow-y: auto;">
+                <div class="loading">Загрузка правил...</div>
+            </div>
+            <div style="padding: 16px; border-top: 1px solid var(--border-color);">
+                <input type="text" id="newRuleInput" placeholder="Новое правило (например: Подарок — стикер)" style="width: 100%; padding: 10px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary); margin-bottom: 8px;">
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="addCustomRule()" style="background: var(--btn-bg); color: white; width: auto; padding: 8px 16px; font-size: 14px;">➕ Добавить</button>
+                    <button onclick="resetDefaultRules()" style="background: var(--reset-bg); color: var(--reset-color); width: auto; padding: 8px 16px; font-size: 14px;">🔄 Сбросить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div id="historyModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1589,6 +1610,104 @@
                 startAutoRefresh();
             } else { loginOverlay.style.display = 'flex'; mainContent.style.display = 'none'; document.getElementById('passwordInput').focus(); }
         }
+
+// ========== ПРАВИЛА ==========
+        let rulesList = [];
+
+        // Загрузка правил из localStorage
+        function loadRules() {
+            const saved = localStorage.getItem('merch_rules');
+            if (saved) {
+                rulesList = JSON.parse(saved);
+            } else {
+                // Правила по умолчанию
+                rulesList = [
+                    { text: "🎁 При покупке открытки → стикер в подарок", type: "gift" },
+                    { text: "📜 При покупке от 1000 ₽ → печать в бланк", type: "stamp" },
+                ];
+                saveRules();
+            }
+        }
+
+        function saveRules() {
+            localStorage.setItem('merch_rules', JSON.stringify(rulesList));
+        }
+    
+        function renderRulesModal() {
+            const container = document.getElementById('rules-list');
+            if (!container) return;
+    
+            if (rulesList.length === 0) {
+                container.innerHTML = '<div class="empty-cart">📭 Нет добавленных правил. Напишите своё!</div>';
+                return;
+            }
+    
+            let html = '';
+            rulesList.forEach((rule, index) => {
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border-color);">
+                        <span style="flex: 1; color: var(--text-primary); font-size: 14px;">${escapeHtml(rule.text)}</span>
+                        <button onclick="deleteRule(${index})" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--minus-color); width: 36px; height: 36px; box-shadow: none;">🗑</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function openRulesModal() {
+            renderRulesModal();
+            const modal = document.getElementById('rulesModal');
+            if (modal) modal.style.display = 'block';
+        }
+
+        function closeRulesModal() {
+            const modal = document.getElementById('rulesModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function addCustomRule() {
+            const input = document.getElementById('newRuleInput');
+            const text = input.value.trim();
+            if (!text) {
+                showToast("Введите правило", false);
+                return;
+            }
+            rulesList.push({ text: text, type: "custom" });
+            saveRules();
+            renderRulesModal();
+            input.value = '';
+            showToast("Правило добавлено ✅", true);
+        }
+
+        function deleteRule(index) {
+            rulesList.splice(index, 1);
+            saveRules();
+            renderRulesModal();
+            showToast("Правило удалено", true);
+        }
+
+        function resetDefaultRules() {
+            rulesList = [
+        { text: "🎁 При покупке открытки → стикер в подарок", type: "gift" },
+        { text: "📜 При покупке от 1000 ₽ → печать в бланк", type: "stamp" },
+            ];
+            saveRules();
+            renderRulesModal();
+            showToast("Правила сброшены к стандартным ✅", true);
+        }
+
+        // Добавляем обработчик закрытия для модалки правил
+        window.onclick = function(event) { 
+            const modal = document.getElementById('historyModal'); 
+            if (event.target === modal) closeHistory();
+            const cartModal = document.getElementById('cartModal');
+            if (event.target === cartModal) closeCartModal();
+            const rulesModal = document.getElementById('rulesModal');
+            if (event.target === rulesModal) closeRulesModal();
+        }
+        
+        // Загружаем правила при старте
+        loadRules();
         
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
