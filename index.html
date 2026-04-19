@@ -242,7 +242,7 @@
             z-index: 10;
         }
         
-        /* Новый стиль для мультиселекта типов (без чекбоксов) */
+        /* Стиль для мультиселекта типов */
         .type-select-list {
             max-height: 250px;
             overflow-y: auto;
@@ -269,7 +269,6 @@
             font-weight: bold;
         }
         
-        /* Закреплённые кнопки внизу выпадающего списка */
         .filter-buttons {
             position: sticky;
             bottom: 0;
@@ -301,6 +300,7 @@
             color: white;
         }
         
+        /* Стили для сортировки */
         .sort-option {
             padding: 10px 12px;
             cursor: pointer;
@@ -309,6 +309,11 @@
             color: var(--text-primary);
         }
         .sort-option:hover { background: var(--badge-bg); }
+        .sort-option.active {
+            background: var(--badge-bg);
+            color: var(--btn-bg);
+            font-weight: 600;
+        }
         
         .reset-btn {
             background: var(--reset-bg);
@@ -432,14 +437,71 @@
         }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); z-index: 1000; overflow-y: auto; }
-        .modal-content { background: var(--modal-bg); margin: 20px auto; border-radius: 20px; padding: 20px; max-width: 550px; max-height: 85vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 18px; font-weight: bold; color: var(--badge-text); }
-        .close-btn { background: none; border: none; font-size: 26px; cursor: pointer; width: 36px; height: 36px; box-shadow: none; color: var(--text-muted); }
-        .history-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
-        .history-date { font-size: 10px; color: var(--text-muted); }
-        .history-name { font-weight: bold; font-size: 15px; color: var(--text-primary); }
-        .history-sale { color: var(--minus-color); font-size: 13px; }
-        .history-return { color: var(--stock-color); font-size: 13px; }
+        .modal-content { background: var(--modal-bg); margin: 20px; border-radius: 20px; padding: 20px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: var(--badge-text);
+            padding-right: 40px;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 26px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            box-shadow: none;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .history-item { 
+            border-bottom: 1px solid var(--border-color); 
+            padding: 12px 0;
+        }
+        .history-date { 
+            font-size: 11px; 
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .history-name { 
+            font-weight: bold; 
+            font-size: 15px; 
+            color: var(--text-primary);
+        }
+        .history-details {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .history-sale { 
+            color: var(--minus-color); 
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .history-return { 
+            color: var(--stock-color); 
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .history-badge {
+            display: inline-block;
+            background: var(--badge-bg);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
         
         .login-card { background: var(--card-bg); border: 2px solid var(--border-color); }
         .login-card h2 { color: var(--badge-text); }
@@ -701,8 +763,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <span>🛒 Корзина</span>
-                <button class="close-btn" onclick="closeCartModal()">×</button>
             </div>
+            <button class="modal-close-btn" onclick="closeCartModal()">×</button>
             <div id="cart-items-list">
                 <div class="empty-cart">Корзина пуста</div>
             </div>
@@ -719,8 +781,8 @@
         <div class="modal-content" style="max-width: 550px;">
             <div class="modal-header">
                 <span>📋 Правила для продавца</span>
-                <button class="close-btn" onclick="closeRulesModal()">×</button>
             </div>
+            <button class="modal-close-btn" onclick="closeRulesModal()">×</button>
             
             <div class="rule-type-buttons">
                 <button class="rule-type-btn" data-type="type" onclick="selectRuleType('type')">📦 По типу</button>
@@ -741,12 +803,13 @@
         </div>
     </div>
     
+    <!-- Модалка истории -->
     <div id="historyModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 550px;">
             <div class="modal-header">
-                <span>📜 История банановых операций</span>
-                <button class="close-btn" onclick="closeHistory()">×</button>
+                <span>📜 История операций</span>
             </div>
+            <button class="modal-close-btn" onclick="closeHistory()">×</button>
             <div id="history-list">
                 <div class="loading">Загрузка истории...</div>
             </div>
@@ -765,6 +828,40 @@
         let selectedTypes = new Set();
         let currentSortBy = "none";
         let typeOptions = [];
+        
+        // ========== ИСТОРИЯ (сохраняется локально) ==========
+        let salesHistory = []; // { date, items: [{name, qty, price}], total, type }
+        
+        function loadHistory() {
+            const saved = localStorage.getItem('merch_sales_history');
+            if (saved) {
+                salesHistory = JSON.parse(saved);
+            } else {
+                salesHistory = [];
+            }
+        }
+        
+        function saveHistory() {
+            localStorage.setItem('merch_sales_history', JSON.stringify(salesHistory));
+        }
+        
+        function addToHistory(items, total, type) {
+            const entry = {
+                date: new Date().toISOString(),
+                items: items.map(item => ({ name: item.name, qty: item.qty, price: item.price })),
+                total: total,
+                type: type // 'basket' - массовая продажа, 'single' - одиночная
+            };
+            salesHistory.unshift(entry); // новые записи сверху
+            // Ограничим историю 100 записями
+            if (salesHistory.length > 100) salesHistory = salesHistory.slice(0, 100);
+            saveHistory();
+        }
+        
+        function addSingleSaleToHistory(name, qty, price) {
+            const total = qty * price;
+            addToHistory([{ name: name, qty: qty, price: price }], total, 'single');
+        }
         
         // ========== ПРАВИЛА ==========
         let rulesList = [];
@@ -1281,6 +1378,27 @@
             if (modal) modal.style.display = 'none';
         }
         
+        async function updateStock(index, delta, silent = false) {
+            const card = originalCardsData[index];
+            if (!card) return;
+            const newStock = card.stock + delta;
+            if (newStock < 0) { if (!silent) showToast("Остаток не может быть меньше 0", false); return; }
+            if (newStock > card.total) { if (!silent) showToast("Остаток не может быть больше " + card.total, false); return; }
+            card.stock = newStock;
+            filterAndSort();
+            try {
+                const response = await fetch(`${API_URL}?action=update&row=${index}&delta=${delta}&t=${Date.now()}`);
+                const result = await response.json();
+                if (!result.success && !silent) { await loadData(true, true); showToast("Ошибка: " + (result.error || "неизвестная"), false); }
+            } catch (error) { console.error(error); if (!silent) { await loadData(true, true); showToast("Ошибка соединения", false); } }
+            updateCartBadges();
+            
+            // Если это одиночная продажа (delta = -1), добавляем в историю
+            if (!silent && delta === -1) {
+                addSingleSaleToHistory(card.name, 1, card.price);
+            }
+        }
+        
         async function checkout() {
             const items = Object.entries(cart).filter(([_, qty]) => qty > 0);
             if (items.length === 0) {
@@ -1305,10 +1423,20 @@
                 for (const rule of activeRules) rulesMessage += `• ${rule.text}\n`;
                 showToast(rulesMessage, true);
             }
+            
+            // Сохраняем в историю
+            const historyItems = items.map(([idxStr, qty]) => {
+                const idx = parseInt(idxStr);
+                const card = originalCardsData[idx];
+                return { name: card.name, qty: qty, price: card.price };
+            });
+            addToHistory(historyItems, total, 'basket');
+            
             const cartCopy = { ...cart };
             closeCartModal();
             cart = {};
             updateCartUI();
+            
             for (const [idxStr, qty] of Object.entries(cartCopy)) {
                 if (qty === 0) continue;
                 const idx = parseInt(idxStr);
@@ -1340,6 +1468,7 @@
                     }
                 }
             }
+            
             (async () => {
                 for (const [idxStr, qty] of Object.entries(cartCopy)) {
                     if (qty === 0) continue;
@@ -1354,7 +1483,7 @@
         }
         
         // ========== ФИЛЬТР ТИПОВ ==========
-        let tempSelectedTypes = new Set(); // временный набор для выбора до применения
+        let tempSelectedTypes = new Set();
         
         function updateTypeFilterTrigger() {
             const trigger = document.getElementById('typeFilterTrigger');
@@ -1372,7 +1501,6 @@
             const dropdown = document.getElementById('typeFilterDropdown');
             if (!dropdown) return;
             
-            // Копируем текущие выбранные типы во временный набор
             tempSelectedTypes = new Set(selectedTypes);
             
             let html = '<div class="type-select-list">';
@@ -1403,21 +1531,17 @@
                 resetBtn.onclick = (e) => {
                     e.stopPropagation();
                     tempSelectedTypes.clear();
-                    // Обновляем отображение
                     const items = document.querySelectorAll('.type-select-item');
                     items.forEach(item => {
                         item.classList.remove('selected');
                         const checkSpan = item.querySelector('.type-select-check');
                         if (checkSpan) checkSpan.remove();
-                        item.innerHTML = item.innerHTML.replace('<span class="type-select-check">✓</span>', '');
                     });
-                    updateTypeFilterTrigger();
                 };
             }
             if (applyBtn) {
                 applyBtn.onclick = (e) => {
                     e.stopPropagation();
-                    // Применяем временные выборы
                     selectedTypes = new Set(tempSelectedTypes);
                     updateTypeFilterTrigger();
                     document.getElementById('typeFilterDropdown').classList.remove('show');
@@ -1432,7 +1556,6 @@
             } else {
                 tempSelectedTypes.add(type);
             }
-            // Обновляем отображение
             const items = document.querySelectorAll('.type-select-item');
             items.forEach(item => {
                 const span = item.querySelector('span:first-child');
@@ -1498,14 +1621,17 @@
                 sortOptions.forEach(opt => {
                     const div = document.createElement('div');
                     div.className = 'sort-option';
-                    div.style.color = currentSortBy === opt.value ? 'var(--btn-bg)' : 'var(--text-primary)';
-                    div.style.fontWeight = currentSortBy === opt.value ? '600' : 'normal';
-                    div.style.backgroundColor = currentSortBy === opt.value ? 'var(--badge-bg)' : 'transparent';
+                    if (currentSortBy === opt.value) {
+                        div.classList.add('active');
+                    }
                     div.textContent = opt.label;
-                    div.onmouseenter = () => { if (currentSortBy !== opt.value) div.style.backgroundColor = 'var(--badge-bg)'; };
-                    div.onmouseleave = () => { if (currentSortBy !== opt.value) div.style.backgroundColor = 'transparent'; };
                     div.onclick = (e) => {
                         e.stopPropagation();
+                        // Убираем активный класс у всех
+                        document.querySelectorAll('.sort-option').forEach(optDiv => {
+                            optDiv.classList.remove('active');
+                        });
+                        div.classList.add('active');
                         currentSortBy = opt.value;
                         sortTrigger.textContent = opt.label;
                         filterAndSort();
@@ -1630,22 +1756,6 @@
             await updateStock(index, delta);
         }
         
-        async function updateStock(index, delta, silent = false) {
-            const card = originalCardsData[index];
-            if (!card) return;
-            const newStock = card.stock + delta;
-            if (newStock < 0) { if (!silent) showToast("Остаток не может быть меньше 0", false); return; }
-            if (newStock > card.total) { if (!silent) showToast("Остаток не может быть больше " + card.total, false); return; }
-            card.stock = newStock;
-            filterAndSort();
-            try {
-                const response = await fetch(`${API_URL}?action=update&row=${index}&delta=${delta}&t=${Date.now()}`);
-                const result = await response.json();
-                if (!result.success && !silent) { await loadData(true, true); showToast("Ошибка: " + (result.error || "неизвестная"), false); }
-            } catch (error) { console.error(error); if (!silent) { await loadData(true, true); showToast("Ошибка соединения", false); } }
-            updateCartBadges();
-        }
-        
         function showUpdateTime() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -1725,31 +1835,43 @@
             }
         }
         
-        async function showHistory() {
+        function showHistory() {
             const modal = document.getElementById('historyModal');
             const historyList = document.getElementById('history-list');
             if (!modal || !historyList) return;
+            
+            if (salesHistory.length === 0) {
+                historyList.innerHTML = '<div class="empty-cart">🍌 История пуста</div>';
+            } else {
+                let html = '';
+                for (const entry of salesHistory) {
+                    const date = new Date(entry.date);
+                    const dateStr = date.toLocaleString('ru-RU');
+                    const isBasket = entry.type === 'basket';
+                    
+                    let itemsHtml = '';
+                    for (const item of entry.items) {
+                        itemsHtml += `<div>• ${item.name}: ${item.qty} шт × ${item.price} ₽ = ${item.qty * item.price} ₽</div>`;
+                    }
+                    
+                    html += `
+                        <div class="history-item">
+                            <div class="history-date">${dateStr} ${isBasket ? '<span class="history-badge">Корзина</span>' : '<span class="history-badge">Поштучно</span>'}</div>
+                            <div class="history-details">${itemsHtml}</div>
+                            <div class="history-sale">💰 Итого: ${entry.total} ₽</div>
+                        </div>
+                    `;
+                }
+                historyList.innerHTML = html;
+            }
             modal.style.display = 'block';
-            historyList.innerHTML = '<div class="loading">Загрузка истории...</div>';
-            try {
-                const response = await fetch(API_URL + "?action=getHistory&t=" + Date.now());
-                const history = await response.json();
-                if (history && history.length > 0) {
-                    historyList.innerHTML = '';
-                    history.forEach(item => {
-                        const date = new Date(item.date);
-                        const dateStr = date.toLocaleString('ru-RU');
-                        const actionClass = item.action === 'Продажа' ? 'history-sale' : 'history-return';
-                        const actionSymbol = item.action === 'Продажа' ? '−' : '+';
-                        const div = document.createElement('div'); div.className = 'history-item';
-                        div.innerHTML = `<div class="history-date">${dateStr}</div><div class="history-name">🍌 ${escapeHtml(item.name)}</div><div class="${actionClass}">${item.action} ${actionSymbol}1 → остаток: ${item.newStock} шт</div>`;
-                        historyList.appendChild(div);
-                    });
-                } else { historyList.innerHTML = '<div class="loading">История пуста 🍌</div>'; }
-            } catch (error) { console.error(error); historyList.innerHTML = '<div class="loading">Ошибка загрузки истории</div>'; }
         }
         
-        function closeHistory() { const modal = document.getElementById('historyModal'); if (modal) modal.style.display = 'none'; }
+        function closeHistory() { 
+            const modal = document.getElementById('historyModal'); 
+            if (modal) modal.style.display = 'none'; 
+        }
+        
         function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
         
         document.addEventListener('click', function(event) {
@@ -1772,6 +1894,10 @@
             currentSortBy = 'none';
             const sortTrigger = document.getElementById('sortByTrigger');
             if (sortTrigger) sortTrigger.textContent = 'Без сортировки';
+            // Сбрасываем активный класс в сортировке
+            document.querySelectorAll('.sort-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
             filterAndSort();
         }
         
@@ -1786,6 +1912,7 @@
                 mainContent.style.display = 'block';
                 initCustomSelects();
                 loadRules();
+                loadHistory();
                 loadData(true, true);
                 startAutoRefresh();
             } else { errorMsg.style.display = 'block'; passwordInput.value = ''; passwordInput.focus(); }
@@ -1799,6 +1926,7 @@
                 mainContent.style.display = 'block';
                 initCustomSelects();
                 loadRules();
+                loadHistory();
                 loadData(true, true);
                 startAutoRefresh();
             } else { loginOverlay.style.display = 'flex'; mainContent.style.display = 'none'; document.getElementById('passwordInput').focus(); }
