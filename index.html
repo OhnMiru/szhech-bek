@@ -1043,7 +1043,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxwaidHeDKFixjtRjOr3zJ75fx-FudEtlKXcH2fkM5_GpHUO5KPKFyCkpNKdMPXv_jFyA/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwzhW881nQZaYuLOogRVGeO_orvSRQMWlvUB1S8Hx5n0wSugAbRLgwlFspkfVZe_oJeFg/exec";
         const CORRECT_PASSWORD = "банан";
         
         let originalCardsData = [];
@@ -1084,8 +1084,10 @@
                 });
                 const result = await response.json();
                 console.log('История синхронизирована с сервером:', result);
+                return result.success;
             } catch (error) {
                 console.error('Ошибка синхронизации истории:', error);
+                return false;
             }
         }
 
@@ -1093,7 +1095,7 @@
             try {
                 const response = await fetch(`${API_URL}?action=getFullHistory&t=${Date.now()}`);
                 const data = await response.json();
-                if (data && data.history) {
+                if (data && data.history && data.history.length > 0) {
                     salesHistory = data.history;
                     saveHistoryToLocal();
                     if (document.getElementById('historyModal')?.style.display === 'block') {
@@ -1106,7 +1108,7 @@
                 console.error('Ошибка загрузки истории с сервера:', error);
                 return false;
             }
-        }
+        }        
 
         function saveHistoryToLocal() {
             localStorage.setItem('merch_sales_history', JSON.stringify(salesHistory));
