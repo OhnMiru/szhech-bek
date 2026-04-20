@@ -448,13 +448,14 @@
         async function saveRulesToServer() {
             try {
                 const data = encodeURIComponent(JSON.stringify(rulesList));
-                await fetch(`${API_URL}?action=saveRules&data=${data}&t=${Date.now()}`);
-                console.log('Правила синхронизированы с сервером');
+                const response = await fetch(`${API_URL}?action=saveRules&data=${data}&t=${Date.now()}`);
+                const result = await response.json();
+                console.log('Правила синхронизированы с сервером:', result);
             } catch (error) {
                 console.error('Ошибка синхронизации правил:', error);
             }
         }
-    
+
         function saveRules() {
             localStorage.setItem('merch_rules_structured', JSON.stringify(rulesList));
             saveRulesToServer();
@@ -468,6 +469,7 @@
                     rulesList = data.rules;
                     localStorage.setItem('merch_rules_structured', JSON.stringify(rulesList));
                     renderRulesList();
+                    console.log('Правила загружены с сервера:', rulesList.length);
                     return;
                 }
             } catch (error) {
