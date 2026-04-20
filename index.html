@@ -369,7 +369,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwh97wwHMwCmNObvn-oCzY_0e9GyY0rI7YW-TbryFPG0Qc9iF79n4UQFHju65zoh0jANw/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbyD2_gkqLxwWhSWyL9QN0FJaTgZg2CIWGiTeDeL6EbDEem4HHabGmVtAiC-QlL_rcQ_zA/exec";
         const CORRECT_PASSWORD = "банан";
         
         let originalCardsData = [];
@@ -393,7 +393,7 @@
             return typeColors.get(type);
         }
         
-        // ========== ИСТОРИЯ ==========
+        // ========== ИСТОРИЯ С ПОЛНОЙ СИНХРОНИЗАЦИЕЙ ==========
         let salesHistory = [];
         let historyMethodFilter = "all";
         let historyTypeFilter = "all";
@@ -411,31 +411,30 @@
             }
         }
 
-        // Сохранение истории через GET запрос
-        async function syncHistoryToServer() {
+        async function syncFullHistoryToServer() {
             try {
-                for (const entry of salesHistory) {
-                    const data = encodeURIComponent(JSON.stringify(entry));
-                    await fetch(`${API_URL}?action=saveHistory&data=${data}&t=${Date.now()}`);
-                }
-                console.log('История синхронизирована с сервером');
-                return true;
+                const data = encodeURIComponent(JSON.stringify(salesHistory));
+                const response = await fetch(`${API_URL}?action=syncFullHistory&data=${data}&t=${Date.now()}`);
+                const result = await response.json();
+                console.log('История полностью синхронизирована с сервером:', result);
+                return result.success;
             } catch (error) {
                 console.error('Ошибка синхронизации истории:', error);
                 return false;
             }
         }
-        // Загрузка истории с сервера
+
         async function loadHistoryFromServer() {
             try {
                 const response = await fetch(`${API_URL}?action=getFullHistory&t=${Date.now()}`);
                 const data = await response.json();
-                if (data && data.history && data.history.length > 0) {
+                if (data && data.history) {
                     salesHistory = data.history;
                     saveHistoryToLocal();
                     if (document.getElementById('historyModal')?.style.display === 'block') {
                         renderHistoryList();
                     }
+                    console.log('История загружена с сервера, записей:', salesHistory.length);
                     return true;
                 }
                 return false;
@@ -444,46 +443,7 @@
                 return false;
             }
         }
-        // Сохранение правил
-        async function saveRulesToServer() {
-            try {
-                const data = encodeURIComponent(JSON.stringify(rulesList));
-                const response = await fetch(`${API_URL}?action=saveRules&data=${data}&t=${Date.now()}`);
-                const result = await response.json();
-                console.log('Правила синхронизированы с сервером:', result);
-            } catch (error) {
-                console.error('Ошибка синхронизации правил:', error);
-            }
-        }
 
-        function saveRules() {
-            localStorage.setItem('merch_rules_structured', JSON.stringify(rulesList));
-            saveRulesToServer();
-        }
-
-        async function loadRules() {
-            try {
-                const response = await fetch(`${API_URL}?action=getRules&t=${Date.now()}`);
-                const data = await response.json();
-                if (data && data.rules && data.rules.length > 0) {
-                    rulesList = data.rules;
-                    localStorage.setItem('merch_rules_structured', JSON.stringify(rulesList));
-                    renderRulesList();
-                    console.log('Правила загружены с сервера:', rulesList.length);
-                    return;
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки правил с сервера:', error);
-            }
-            const saved = localStorage.getItem('merch_rules_structured');
-            if (saved) {
-                rulesList = JSON.parse(saved);
-            } else {
-                rulesList = [];
-            }
-            renderRulesList();
-        }
-        
         async function loadHistory() {
             const loaded = await loadHistoryFromServer();
             if (!loaded) {
@@ -493,7 +453,7 @@
 
         function saveHistory() {
             saveHistoryToLocal();
-            syncHistoryToServer();
+            syncFullHistoryToServer();
         }
 
         function addToHistory(items, total, method, isReturn = false) {
@@ -507,16 +467,12 @@
             };
             salesHistory.unshift(entry);
             if (salesHistory.length > 200) salesHistory = salesHistory.slice(0, 200);
-            saveHistoryToLocal();
-    
-            // Отправляем запись на сервер
-            const data = encodeURIComponent(JSON.stringify(entry));
-            fetch(`${API_URL}?action=saveHistory&data=${data}&t=${Date.now()}`).catch(e => console.error(e));
-    
+            saveHistory();
             if (document.getElementById('historyModal')?.style.display === 'block') {
                 renderHistoryList();
             }
         }
+
         function addSingleSaleToHistory(name, qty, price, isReturn = false) {
             const total = qty * price;
             addToHistory([{ name: name, qty: qty, price: price }], total, 'single', isReturn);
@@ -544,9 +500,107 @@
             if (historySyncInterval) clearInterval(historySyncInterval);
             historySyncInterval = setInterval(async () => {
                 await loadHistoryFromServer();
-            }, 10000); // каждые 10 секунд
+            }, 30000);
         }
 
+        function deleteHistoryEntry(id) {
+            salesHistory = salesHistory.filter(entry => entry.id != id);
+            saveHistory();
+            renderHistoryList();
+            showToast("Запись удалена", true);
+        }
+
+        function clearAllHistory() {
+            if (salesHistory.length === 0) {
+                showToast("История уже пуста", false);
+                return;
+            }
+            if (confirm("Удалить всю историю операций? Это действие нельзя отменить.")) {
+                salesHistory = [];
+                saveHistory();
+                renderHistoryList();
+                showToast("Вся история очищена", true);
+            }
+        }
+
+        // ========== ПРАВИЛА С ПОЛНОЙ СИНХРОНИЗАЦИЕЙ ==========
+        let rulesList = [];
+        let currentRuleType = "type";
+        let selectedProducts = new Set();
+        let scrollPosition = 0;
+
+        async function syncFullRulesToServer() {
+            try {
+                const data = encodeURIComponent(JSON.stringify(rulesList));
+                const response = await fetch(`${API_URL}?action=syncFullRules&data=${data}&t=${Date.now()}`);
+                const result = await response.json();
+                console.log('Правила полностью синхронизированы с сервером:', result);
+                return result.success;
+            } catch (error) {
+                console.error('Ошибка синхронизации правил:', error);
+                return false;
+            }
+        }
+
+        async function loadRulesFromServer() {
+            try {
+                const response = await fetch(`${API_URL}?action=getRules&t=${Date.now()}`);
+                const data = await response.json();
+                if (data && data.rules) {
+                    rulesList = data.rules;
+                    localStorage.setItem('merch_rules_structured', JSON.stringify(rulesList));
+                    renderRulesList();
+                    console.log('Правила загружены с сервера, правил:', rulesList.length);
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Ошибка загрузки правил с сервера:', error);
+                return false;
+            }
+        }
+
+        async function loadRules() {
+            const loaded = await loadRulesFromServer();
+            if (!loaded) {
+                const saved = localStorage.getItem('merch_rules_structured');
+                if (saved) {
+                    rulesList = JSON.parse(saved);
+                } else {
+                    rulesList = [];
+                }
+                renderRulesList();
+            }
+        }
+
+        function saveRules() {
+            localStorage.setItem('merch_rules_structured', JSON.stringify(rulesList));
+            syncFullRulesToServer();
+        }
+
+        function deleteRule(index) {
+            rulesList.splice(index, 1);
+            saveRules();
+            renderRulesList();
+            updateCartUI();
+            showToast("Правило удалено", true);
+        }
+
+        function deleteAllRules() {
+            if (rulesList.length === 0) {
+                showToast("Нет правил для удаления", false);
+                return;
+            }
+            if (confirm("Удалить все правила?")) {
+                rulesList = [];
+                saveRules();
+                renderRulesList();
+                updateCartUI();
+                showToast("Все правила удалены ✅", true);
+            }
+        }
+
+        // ========== ДАТА И ВРЕМЯ ДЛЯ ФИЛЬТРОВ ==========
         function initDateTimeSelects() {
             const currentYear = new Date().getFullYear();
             const years = [];
@@ -673,26 +727,6 @@
             renderHistoryList();
         }
 
-        function deleteHistoryEntry(id) {
-            salesHistory = salesHistory.filter(entry => entry.id !== id);
-            saveHistory();
-            renderHistoryList();
-            showToast("Запись удалена", true);
-        }
-
-        function clearAllHistory() {
-            if (salesHistory.length === 0) {
-                showToast("История уже пуста", false);
-                return;
-            }
-            if (confirm("Удалить всю историю операций? Это действие нельзя отменить.")) {
-                salesHistory = [];
-                saveHistory();
-                renderHistoryList();
-                showToast("Вся история очищена", true);
-            }
-        }
-
         function renderHistoryList() {
             const container = document.getElementById('history-list');
             if (!container) return;
@@ -743,47 +777,14 @@
                             <div class="history-details">${itemsHtml}</div>
                             <div class="${isReturn ? 'history-return' : 'history-sale'}">${isReturn ? '↩️' : '💰'} Итого: ${entry.total} ₽</div>
                         </div>
-                        <button class="history-delete-btn" onclick="deleteHistoryEntry(${entry.id})" title="Удалить запись">🗑</button>
+                        <button class="history-delete-btn" onclick="deleteHistoryEntry('${entry.id}')" title="Удалить запись">🗑</button>
                     </div>
                 `;
             }
             container.innerHTML = html;
         }
         
-        // ========== ПРАВИЛА ==========
-        let rulesList = [];
-        let currentRuleType = "type";
-        let selectedProducts = new Set();
-        let scrollPosition = 0;
-        
-        async function loadRules() {
-            try {
-                const response = await fetch(`${API_URL}?action=getRules&t=${Date.now()}`);
-                const data = await response.json();
-                if (data && data.rules && data.rules.length > 0) {
-                    rulesList = data.rules;
-                    localStorage.setItem('merch_rules_structured', JSON.stringify(rulesList));
-                    renderRulesList();
-                    return;
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки правил с сервера:', error);
-            }
-            const saved = localStorage.getItem('merch_rules_structured');
-            if (saved) rulesList = JSON.parse(saved);
-            else rulesList = [];
-            renderRulesList();
-        }
-        
-        function saveRules() {
-            localStorage.setItem('merch_rules_structured', JSON.stringify(rulesList));
-            fetch(`${API_URL}?action=syncRules&t=${Date.now()}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ rules: rulesList })
-            }).catch(e => console.error('Ошибка синхронизации правил:', e));
-        }
-        
+        // ========== ФУНКЦИИ ПРАВИЛ (UI) ==========
         function selectRuleType(type) {
             currentRuleType = type;
             selectedProducts.clear();
@@ -978,22 +979,6 @@
                         </div>`;
             });
             container.innerHTML = html;
-        }
-        
-        function deleteRule(index) {
-            rulesList.splice(index, 1);
-            saveRules();
-            renderRulesList();
-            updateCartUI();
-            showToast("Правило удалено", true);
-        }
-        
-        function deleteAllRules() {
-            rulesList = [];
-            saveRules();
-            renderRulesList();
-            updateCartUI();
-            showToast("Все правила удалены ✅", true);
         }
         
         function openRulesModal() {
