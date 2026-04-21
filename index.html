@@ -527,7 +527,6 @@
             align-items: baseline;
             gap: 8px;
             flex-wrap: wrap;
-            margin-top: 0;
             margin-bottom: 3px;
         }
 
@@ -537,8 +536,36 @@
             color: var(--stock-color);
         }
 
+        .total-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 2px;
+        }
+
+        .total {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 2px;
+        }
+
+        .price {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--price-color);
+        }
+
         .edit-icon {
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             color: var(--text-muted);
             background: none;
@@ -554,23 +581,6 @@
 
         .edit-icon:hover {
             color: var(--text-secondary);
-        }
-
-        .total,
-        .price {
-            font-size: 11px;
-            font-weight: 500;
-            margin-top: 0;
-            margin-bottom: 2px;
-            line-height: 1.3;
-        }
-
-        .total {
-            color: var(--text-muted);
-        }
-
-        .price {
-            color: var(--price-color);
         }
 
         .buttons {
@@ -1671,7 +1681,7 @@
         .discount-section {
             background: var(--badge-bg);
             border-radius: 16px;
-            padding: 12px;
+            padding: 8px 12px;
             margin-bottom: 16px;
         }
 
@@ -1679,7 +1689,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
             cursor: pointer;
         }
 
@@ -1689,51 +1698,201 @@
             color: var(--badge-text);
         }
 
-        .discount-input-group {
+        .discount-chevron {
+            font-size: 12px;
+            color: var(--badge-text);
+            transition: transform 0.2s;
+        }
+
+        .discount-content {
+            margin-top: 10px;
+        }
+
+        .discount-group {
+            margin-bottom: 12px;
+        }
+
+        .discount-group-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--badge-text);
+            margin-bottom: 6px;
+        }
+
+        .discount-row {
             display: flex;
-            gap: 10px;
             align-items: center;
-            margin-top: 8px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
-        .discount-input {
+        /* Кастомный селект для типа скидки */
+        .discount-custom-select {
+            position: relative;
+            min-width: 100px;
+        }
+
+        .discount-custom-select-trigger {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .discount-custom-select-trigger:after {
+            content: '▼';
+            font-size: 8px;
+            color: var(--text-secondary);
+        }
+
+        .discount-custom-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            z-index: 100;
+            display: none;
+            margin-top: 4px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .discount-custom-select-dropdown.show {
+            display: block;
+        }
+
+        .discount-select-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .discount-select-option:hover {
+            background: var(--badge-bg);
+        }
+
+        /* Поле суммы скидки с кнопками + и - */
+        .discount-amount-control {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             flex: 1;
-            padding: 8px 12px;
+        }
+
+        .discount-amount-input {
+            flex: 1;
+            padding: 6px 8px;
             border: 1px solid var(--border-color);
             border-radius: 30px;
             background: var(--card-bg);
             color: var(--text-primary);
             font-size: 13px;
+            text-align: center;
+            min-width: 80px;
         }
 
-        .discount-select {
-            padding: 8px 12px;
+        .discount-step-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            background: var(--badge-bg);
             border: 1px solid var(--border-color);
-            border-radius: 30px;
-            background: var(--card-bg);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
             color: var(--text-primary);
-            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .discount-actions {
+        .discount-step-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Кнопки скидок в один ряд */
+        .discount-buttons-row {
             display: flex;
             gap: 8px;
-            margin-top: 8px;
+            margin-top: 12px;
         }
 
-        .discount-btn {
+        .discount-action-btn {
+            flex: 1;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 6px 12px;
+            border-radius: 30px;
+            padding: 6px 8px;
             font-size: 12px;
             cursor: pointer;
             color: var(--text-primary);
+            text-align: center;
+            transition: all 0.2s;
         }
 
-        .discount-btn:hover {
+        .discount-action-btn:hover {
             background: var(--badge-bg);
+        }
+
+        /* Кнопка "Товары" отдельно, чуть шире */
+        .discount-products-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+            text-align: center;
+            margin-top: 8px;
+            width: 100%;
+            max-width: 120px;
+        }
+
+        .discount-products-btn:hover {
+            background: var(--badge-bg);
+        }
+
+        /* Список выбора товаров для скидки */
+        .product-select-list {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-top: 8px;
+            background: var(--card-bg);
+        }
+
+        .product-select-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        .product-select-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-select-item.selected {
+            background: var(--badge-bg);
+        }
+
+        .product-select-check {
+            color: var(--btn-bg);
+            margin-left: 8px;
         }
 
         /* Стили для редактирования товара */
@@ -1792,38 +1951,6 @@
             font-size: 12px;
             cursor: pointer;
             flex: 1;
-        }
-
-        /* Стили для выбора товаров в скидке */
-        .product-select-list {
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            margin-top: 8px;
-            background: var(--card-bg);
-        }
-
-        .product-select-item {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 12px;
-        }
-
-        .product-select-item:last-child {
-            border-bottom: none;
-        }
-
-        .product-select-item.selected {
-            background: var(--badge-bg);
-        }
-
-        .product-select-check {
-            color: var(--btn-bg);
-            margin-left: 8px;
         }
 
         @media (min-width: 1024px) {
@@ -1979,12 +2106,17 @@
         body.dark .extra-cost-name,
         body.dark .extra-cost-amount,
         body.dark .discount-title,
+        body.dark .discount-group-title,
+        body.dark .discount-custom-select-trigger,
+        body.dark .discount-select-option,
         body.dark .cart-item-name,
         body.dark .cart-item-price,
         body.dark .cart-total,
         body.dark .cart-qty-btn,
         body.dark .edit-label,
-        body.dark .edit-input {
+        body.dark .edit-input,
+        body.dark .discount-action-btn,
+        body.dark .discount-products-btn {
             color: #f5e6c4 !important;
         }
 
@@ -2181,127 +2313,7 @@
             </div>
         </div>
     </div>
-    <!-- Модалка корзины -->
-    <div id="cartModal" class="modal cart-modal">
-        <div class="modal-content">
-            <button class="modal-close-btn" onclick="closeCartModal()">×</button>
-            <div class="modal-header">
-                <span>🛒 Корзина</span>
-            </div>
-            <div id="discount-panel" class="discount-section"></div>
-            <div id="cart-items-list">
-                <div class="empty-cart">Корзина пуста</div>
-            </div>
-            <div id="cart-total" class="cart-total" style="display:none;">Итого: 0 ₽</div>
-            <div class="cart-actions" id="cart-actions" style="display:none;">
-                <button class="cart-clear" onclick="clearCart()">Очистить</button>
-                <button class="cart-checkout" onclick="checkout()">✅ Продать всё</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Модалка правил -->
-    <div id="rulesModal" class="modal">
-        <div class="modal-content" style="max-width: 550px;">
-            <button class="modal-close-btn" onclick="closeRulesModal()">×</button>
-            <div class="modal-header">
-                <span>📋 Правила для продавца</span>
-            </div>
-
-            <div class="rule-type-buttons">
-                <button class="rule-type-btn" data-type="type" onclick="selectRuleType('type')">📦 По типу</button>
-                <button class="rule-type-btn" data-type="product" onclick="selectRuleType('product')">🏷️ По товару</button>
-                <button class="rule-type-btn" data-type="price" onclick="selectRuleType('price')">💰 По сумме</button>
-                <button class="rule-type-btn" data-type="bonus" onclick="selectRuleType('bonus')">💵 Бонус</button>
-            </div>
-
-            <div id="ruleTypeContent"></div>
-
-            <button onclick="addStructuredRule()" style="background: var(--btn-bg); color: white; width: 100%; padding: 12px; border-radius: 30px; border: none; font-size: 14px; margin-top: 8px; cursor: pointer;">➕ Добавить правило</button>
-
-            <div style="font-weight: bold; margin: 20px 0 12px 0;">📋 Список правил</div>
-            <div id="rules-list" style="max-height: 300px; overflow-y: auto;">
-                <div class="empty-cart">📭 Нет добавленных правил. Создайте новое!</div>
-            </div>
-
-            <button onclick="deleteAllRules()" style="background: var(--minus-bg); color: var(--minus-color); width: 100%; padding: 12px; border-radius: 30px; border: none; font-size: 14px; margin-top: 12px; cursor: pointer;">🗑 Удалить все правила</button>
-        </div>
-    </div>
-
-    <!-- Модалка истории -->
-    <div id="historyModal" class="modal">
-        <div class="modal-content" style="max-width: 550px;">
-            <button class="modal-close-btn" onclick="closeHistory()">×</button>
-            <div class="modal-header">
-                <span>📜 История операций</span>
-            </div>
-            <div class="history-filters">
-                <div class="history-filter-row">
-                    <div class="history-filter-buttons-group">
-                        <button class="history-filter-btn history-filter-btn-small" data-method="all" onclick="setHistoryMethodFilter('all')">Все</button>
-                        <button class="history-filter-btn history-filter-btn-large" data-method="basket" onclick="setHistoryMethodFilter('basket')">Корзина</button>
-                        <button class="history-filter-btn history-filter-btn-large" data-method="single" onclick="setHistoryMethodFilter('single')">Поштучно</button>
-                    </div>
-                    <div class="history-filter-buttons-group">
-                        <button class="history-filter-btn history-filter-btn-small" data-type="all" onclick="setHistoryTypeFilter('all')">Все</button>
-                        <button class="history-filter-btn history-filter-btn-large" data-type="sale" onclick="setHistoryTypeFilter('sale')">Продажи</button>
-                        <button class="history-filter-btn history-filter-btn-large" data-type="return" onclick="setHistoryTypeFilter('return')">Возвраты</button>
-                    </div>
-                </div>
-                <div class="history-filter-bottom">
-                    <div class="history-filter-left">
-                        <!-- Строка "с" -->
-                        <div class="custom-datetime" id="datetimeFromContainer">
-                            <span class="datetime-label">с</span>
-                            <div class="datetime-group">
-                                <select id="dateFromDay" class="datetime-select"></select>
-                                <span class="datetime-sep"> </span>
-                                <select id="dateFromMonth" class="datetime-select"></select>
-                                <span class="datetime-sep"> </span>
-                                <select id="dateFromYear" class="datetime-select"></select>
-                            </div>
-                            <div class="datetime-group">
-                                <select id="timeFromHour" class="datetime-select"></select>
-                                <span class="datetime-sep">:</span>
-                                <select id="timeFromMinute" class="datetime-select"></select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="history-filter-left" style="margin-top: 8px;">
-                        <!-- Строка "по" -->
-                        <div class="custom-datetime" id="datetimeToContainer">
-                            <span class="datetime-label">по</span>
-                            <div class="datetime-group">
-                                <select id="dateToDay" class="datetime-select"></select>
-                                <span class="datetime-sep"> </span>
-                                <select id="dateToMonth" class="datetime-select"></select>
-                                <span class="datetime-sep"> </span>
-                                <select id="dateToYear" class="datetime-select"></select>
-                            </div>
-                            <div class="datetime-group">
-                                <select id="timeToHour" class="datetime-select"></select>
-                                <span class="datetime-sep">:</span>
-                                <select id="timeToMinute" class="datetime-select"></select>
-                            </div>
-                        </div>
-                        <div class="history-price-filter">
-                            <span>💰</span>
-                            <input type="number" id="historyMinPrice" placeholder="0" value="0" step="100">
-                            <span class="history-price-separator">—</span>
-                            <input type="number" id="historyMaxPrice" placeholder="∞" step="100">
-                        </div>
-                    </div>
-                    <div class="history-filter-reset-row">
-                        <button class="history-filter-reset" onclick="resetHistoryFilters()">Сбросить</button>
-                    </div>
-                </div>
-            </div>
-            <button class="history-clear-btn" onclick="clearAllHistory()">🗑 Очистить всю историю</button>
-            <div id="history-list">
-                <div class="loading">Загрузка истории...</div>
-            </div>
-        </div>
-    </div>
     <!-- Модалка статистики -->
     <div id="statsModal" class="modal">
         <div class="modal-content" style="max-width: 800px;">
@@ -2338,7 +2350,6 @@
             </div>
         </div>
     </div>
-
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzTy-EPlVQ5HYDbqCMdZ0fj10j5SzQ0EDJWmIjBhaBO_rKFaUZJIj4TQe9DZEcTd67aug/exec";
         const CORRECT_PASSWORD = "банан";
@@ -2410,19 +2421,66 @@
         }
 
         // ========== СКИДКИ ==========
+        let discountPanelOpen = false;
+
         function toggleDiscountPanel() {
+            discountPanelOpen = !discountPanelOpen;
             const content = document.getElementById('discount-content');
-            if (content) content.style.display = content.style.display === 'none' ? 'block' : 'none';
+            const chevron = document.getElementById('discount-chevron');
+            if (content) {
+                content.style.display = discountPanelOpen ? 'block' : 'none';
+            }
+            if (chevron) {
+                chevron.textContent = discountPanelOpen ? '▲' : '▼';
+            }
         }
 
-        function updateCartDiscount() {
-            const type = document.getElementById('cartDiscountType').value;
-            const value = parseFloat(document.getElementById('cartDiscountValue').value) || 0;
-            cartDiscount = {
-                type,
-                value
-            };
+        function closeDiscountPanel() {
+            discountPanelOpen = false;
+            const content = document.getElementById('discount-content');
+            const chevron = document.getElementById('discount-chevron');
+            if (content) content.style.display = 'none';
+            if (chevron) chevron.textContent = '▼';
+        }
+
+        // Кастомный селект для типа скидки на корзину
+        function toggleCartDiscountSelect() {
+            const dropdown = document.getElementById('cartDiscountSelectDropdown');
+            if (dropdown) dropdown.classList.toggle('show');
+        }
+
+        function selectCartDiscountType(type, label) {
+            cartDiscount.type = type;
+            const trigger = document.getElementById('cartDiscountSelectTrigger');
+            if (trigger) trigger.textContent = label;
+            const dropdown = document.getElementById('cartDiscountSelectDropdown');
+            if (dropdown) dropdown.classList.remove('show');
+            const valueInput = document.getElementById('cartDiscountValue');
+            if (valueInput) valueInput.disabled = (type === 'none');
+            if (type === 'none') {
+                cartDiscount.value = 0;
+                if (valueInput) valueInput.value = 0;
+            }
             updateCartUI();
+        }
+
+        function changeDiscountValue(delta) {
+            const input = document.getElementById('cartDiscountValue');
+            if (input) {
+                let val = parseFloat(input.value) || 0;
+                val = Math.max(0, val + delta);
+                input.value = val;
+                cartDiscount.value = val;
+                updateCartUI();
+            }
+        }
+
+        function updateCartDiscountFromInput() {
+            const input = document.getElementById('cartDiscountValue');
+            if (input) {
+                cartDiscount.value = parseFloat(input.value) || 0;
+                updateCartUI();
+            }
         }
 
         function resetCartDiscount() {
@@ -2430,6 +2488,14 @@
                 type: 'none',
                 value: 0
             };
+            const trigger = document.getElementById('cartDiscountSelectTrigger');
+            if (trigger) trigger.textContent = 'Без скидки';
+            const valueInput = document.getElementById('cartDiscountValue');
+            if (valueInput) {
+                valueInput.value = 0;
+                valueInput.disabled = true;
+            }
+            closeDiscountPanel();
             updateCartUI();
         }
 
@@ -2464,7 +2530,8 @@
         }
 
         function applyItemDiscount() {
-            const type = document.getElementById('itemDiscountType').value;
+            const typeSelect = document.getElementById('itemDiscountTypeSelect');
+            const type = typeSelect ? typeSelect.getAttribute('data-value') || 'percent' : 'percent';
             const value = parseFloat(document.getElementById('itemDiscountValue').value) || 0;
             if (selectedDiscountProducts.size === 0) {
                 showToast("Выберите товары для скидки", false);
@@ -2476,8 +2543,8 @@
                     const idx = originalCardsData.findIndex(c => c.name === productName);
                     if (!itemDiscounts[idx]) itemDiscounts[idx] = {};
                     itemDiscounts[idx] = {
-                        type,
-                        value
+                        type: type,
+                        value: value
                     };
                 }
             }
@@ -2485,6 +2552,7 @@
             discountProductListVisible = false;
             const container = document.getElementById('productDiscountList');
             if (container) container.style.display = 'none';
+            closeDiscountPanel();
             updateCartUI();
             showToast("Скидка применена к выбранным товарам", true);
         }
@@ -2493,6 +2561,21 @@
             itemDiscounts = {};
             updateCartUI();
             showToast("Скидки на товары сброшены", true);
+        }
+
+        // Кастомный селект для типа скидки на товары
+        function toggleItemDiscountSelect() {
+            const dropdown = document.getElementById('itemDiscountSelectDropdown');
+            if (dropdown) dropdown.classList.toggle('show');
+        }
+
+        function selectItemDiscountType(type, label) {
+            const trigger = document.getElementById('itemDiscountSelectTrigger');
+            const hiddenSelect = document.getElementById('itemDiscountTypeSelect');
+            if (trigger) trigger.textContent = label;
+            if (hiddenSelect) hiddenSelect.setAttribute('data-value', type);
+            const dropdown = document.getElementById('itemDiscountSelectDropdown');
+            if (dropdown) dropdown.classList.remove('show');
         }
 
         // ========== ДОПОЛНИТЕЛЬНЫЕ РАСХОДЫ ==========
@@ -2696,6 +2779,7 @@
         let currentRuleType = "type";
         let selectedProducts = new Set();
         let scrollPosition = 0;
+        let itemDiscounts = {};
 
         async function syncFullRulesToServer() {
             try {
@@ -2961,6 +3045,7 @@
             }
             container.innerHTML = html;
         }
+
         // ========== ФУНКЦИИ ПРАВИЛ (UI) ==========
         function selectRuleType(type) {
             currentRuleType = type;
@@ -3078,11 +3163,8 @@
                 const priceInput = document.getElementById('rulePriceMin');
                 if (priceInput && !priceInput.value) priceInput.value = 1000;
             } else if (currentRuleType === 'bonus') {
-                const bonusRule = rulesList.find(r => r.type === 'bonus');
-                const isActive = bonusRule ? bonusRule.active : false;
-                const message = bonusRule ? bonusRule.message : "Бонус за наличку: +1 стикер";
                 container.innerHTML = `
-                    <input type="text" id="bonusMessage" class="rule-styled-input" placeholder="Текст бонуса" value="${escapeHtml(message)}">
+                    <input type="text" id="bonusMessage" class="rule-styled-input" placeholder="Текст бонуса" value="Бонус за наличку: +1 стикер">
                 `;
             }
         }
@@ -3143,23 +3225,12 @@
                 };
             } else if (currentRuleType === 'bonus') {
                 const message = document.getElementById('bonusMessage')?.value.trim() || "Бонус за наличку: +1 стикер";
-                const existingIndex = rulesList.findIndex(r => r.type === 'bonus');
-                if (existingIndex !== -1) {
-                    rulesList[existingIndex].message = message;
-                    saveRules();
-                    renderRulesList();
-                    showToast("Бонус обновлён ✅", true);
-                    renderRuleForm();
-                    updateCartUI();
-                    return;
-                } else {
-                    newRule = {
-                        type: "bonus",
-                        message: message,
-                        icon: "💵",
-                        active: true
-                    };
-                }
+                newRule = {
+                    type: "bonus",
+                    message: message,
+                    icon: "💵",
+                    active: true
+                };
             }
             if (newRule) {
                 rulesList.push(newRule);
@@ -3192,7 +3263,7 @@
                                 <div style="font-size: 14px; font-weight: bold; color: var(--badge-text);">${rule.icon} ${escapeHtml(rule.message)}</div>
                                 <div style="font-size: 11px; color: var(--text-muted);">${conditionText}</div>
                             </div>
-                            ${rule.type !== 'bonus' ? `<button onclick="toggleRuleActive(${index})" style="background: none; border: none; font-size: 16px; cursor: pointer; width: 36px; height: 36px;">${statusText}</button>` : ''}
+                            <button onclick="toggleRuleActive(${index})" style="background: none; border: none; font-size: 16px; cursor: pointer; width: 36px; height: 36px;">${statusText}</button>
                             <button onclick="deleteRule(${index})" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--minus-color); width: 36px; height: 36px; box-shadow: none;">🗑</button>
                         </div>`;
             });
@@ -3241,15 +3312,8 @@
             }
 
             const activeRules = [];
-            const bonusRule = rulesList.find(r => r.type === 'bonus' && r.active === true);
-            if (bonusRule) activeRules.push({
-                icon: bonusRule.icon || "💵",
-                message: bonusRule.message,
-                condition: ""
-            });
 
             for (const rule of rulesList) {
-                if (rule.type === 'bonus') continue;
                 if (rule.active === false) continue;
                 let isActive = false;
                 let detailText = "";
@@ -3273,6 +3337,9 @@
                         isActive = true;
                         detailText = `(сумма ${totalPrice} ₽, нужно от ${rule.condition.minSum} ₽)`;
                     }
+                } else if (rule.type === 'bonus') {
+                    isActive = true;
+                    detailText = "";
                 }
                 if (isActive) activeRules.push({
                     icon: rule.icon || "✨",
@@ -3282,6 +3349,7 @@
             }
             return activeRules;
         }
+
         // ========== СТАТИСТИКА ==========
         function openStatsModal() {
             const modal = document.getElementById('statsModal');
@@ -3401,7 +3469,7 @@
                 </tbody></table></div>
                 <div class="detail-section"><div class="detail-title">🏷️ Детализация по типам мерча</div><table class="detail-table"><thead><tr><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Себест.</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th></tr></thead><tbody>
                     ${typeDetails.map(t => `<tr><td><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td><td class="text-right">${t.qty} шт</td><td class="text-right">${formatCurrency(t.revenue)}</td><td class="text-right">${formatCurrency(t.totalCost)}</td><td class="text-right ${t.profit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(t.profit)}</td><td class="text-right ${t.margin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(t.margin)}</td></tr>`).join('')}
-                </tbody></table></div>
+                </tbody></tr></div>
                 <div class="two-columns">
                     <div class="detail-section"><div class="detail-title">🏆 Самые популярные товары</div><table class="detail-table"><thead><tr><th>#</th><th>Товар</th><th>Тип</th><th class="text-right">Продано, шт</th></tr></thead><tbody>
                         ${topByQty.map(([name, data], idx) => `<tr><td class="text-right"><span class="popular-badge">${idx+1}</span></td><td>${escapeHtml(name)}</td><td><span class="type-badge" style="background:${getTypeColor(data.type)}20; color:${getTypeColor(data.type)};">${escapeHtml(data.type)}</span></td><td class="text-right">${data.qty} шт</td></tr>`).join('')}
@@ -3432,9 +3500,9 @@
             if (amountInput) amountInput.value = '0';
             renderStats();
         }
+
         // ========== КОРЗИНА ==========
         let cart = {};
-        let itemDiscounts = {};
 
         function showToast(message, isSuccess = true) {
             const existingToast = document.querySelector('.toast-notification');
@@ -3491,21 +3559,71 @@
                 return;
             }
 
-            let discountHtml = `<div class="discount-section"><div class="discount-header" onclick="toggleDiscountPanel()"><span class="discount-title">🎯 Скидки</span><span>▼</span></div><div id="discount-content" style="display: none;">
-                <div style="margin-bottom: 12px;"><div class="discount-title" style="font-size: 13px;">Скидка на всю корзину</div>
-                <div class="discount-input-group"><select id="cartDiscountType" class="discount-select" onchange="updateCartDiscount()">
-                    <option value="none" ${cartDiscount.type === 'none' ? 'selected' : ''}>Без скидки</option>
-                    <option value="percent" ${cartDiscount.type === 'percent' ? 'selected' : ''}>%</option>
-                    <option value="fixed" ${cartDiscount.type === 'fixed' ? 'selected' : ''}>₽</option>
-                </select><input type="number" id="cartDiscountValue" class="discount-input" placeholder="Сумма скидки" value="${cartDiscount.value}" onchange="updateCartDiscount()" ${cartDiscount.type === 'none' ? 'disabled' : ''}></div></div>
-                <div style="margin-bottom: 12px;"><div class="discount-title" style="font-size: 13px;">Скидка на отдельные товары</div>
-                <div class="discount-input-group"><select id="itemDiscountType" class="discount-select"><option value="percent">%</option><option value="fixed">₽</option></select>
-                <input type="number" id="itemDiscountValue" class="discount-input" placeholder="Сумма скидки" value="0">
-                <button class="discount-btn" onclick="toggleDiscountProductsList()">Выбрать товары</button></div>
-                <div id="productDiscountList" style="display: none; margin-top: 8px;"></div>
-                <div class="discount-actions"><button class="discount-btn" onclick="applyItemDiscount()">Применить</button><button class="discount-btn" onclick="resetItemDiscounts()">Сбросить</button></div></div>
-                <div class="discount-actions"><button class="discount-btn" onclick="resetCartDiscount()">Сбросить все скидки</button></div></div></div>`;
+            // Рендер панели скидок
+            let discountHtml = `
+                <div class="discount-section">
+                    <div class="discount-header" onclick="toggleDiscountPanel()">
+                        <span class="discount-title">🎯 Скидки</span>
+                        <span class="discount-chevron" id="discount-chevron">▼</span>
+                    </div>
+                    <div id="discount-content" class="discount-content" style="display: none;">
+                        <div class="discount-group">
+                            <div class="discount-group-title">Скидка на всю корзину</div>
+                            <div class="discount-row">
+                                <div class="discount-custom-select">
+                                    <div class="discount-custom-select-trigger" id="cartDiscountSelectTrigger" onclick="toggleCartDiscountSelect()">Без скидки</div>
+                                    <div class="discount-custom-select-dropdown" id="cartDiscountSelectDropdown">
+                                        <div class="discount-select-option" onclick="selectCartDiscountType('none', 'Без скидки')">Без скидки</div>
+                                        <div class="discount-select-option" onclick="selectCartDiscountType('percent', '%')">%</div>
+                                        <div class="discount-select-option" onclick="selectCartDiscountType('fixed', '₽')">₽</div>
+                                    </div>
+                                </div>
+                                <div class="discount-amount-control">
+                                    <button class="discount-step-btn" onclick="changeDiscountValue(-100)">−</button>
+                                    <input type="number" id="cartDiscountValue" class="discount-amount-input" value="0" ${cartDiscount.type === 'none' ? 'disabled' : ''} onchange="updateCartDiscountFromInput()">
+                                    <button class="discount-step-btn" onclick="changeDiscountValue(100)">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="discount-group">
+                            <div class="discount-group-title">Скидка на отдельные товары</div>
+                            <div class="discount-row">
+                                <div class="discount-custom-select">
+                                    <div class="discount-custom-select-trigger" id="itemDiscountSelectTrigger" onclick="toggleItemDiscountSelect()">%</div>
+                                    <div class="discount-custom-select-dropdown" id="itemDiscountSelectDropdown">
+                                        <div class="discount-select-option" onclick="selectItemDiscountType('percent', '%')">%</div>
+                                        <div class="discount-select-option" onclick="selectItemDiscountType('fixed', '₽')">₽</div>
+                                    </div>
+                                    <input type="hidden" id="itemDiscountTypeSelect" data-value="percent">
+                                </div>
+                                <input type="number" id="itemDiscountValue" class="discount-amount-input" placeholder="Сумма" value="0" step="100">
+                            </div>
+                            <button class="discount-products-btn" onclick="toggleDiscountProductsList()">Товары</button>
+                            <div id="productDiscountList" style="display: none; margin-top: 8px;"></div>
+                        </div>
+
+                        <div class="discount-buttons-row">
+                            <button class="discount-action-btn" onclick="applyItemDiscount()">Применить</button>
+                            <button class="discount-action-btn" onclick="closeDiscountPanel()">Отмена</button>
+                            <button class="discount-action-btn" onclick="resetCartDiscount()">Сбросить все скидки</button>
+                        </div>
+                    </div>
+                </div>
+            `;
             if (discountPanel) discountPanel.innerHTML = discountHtml;
+
+            // Закрываем выпадающие списки при клике вне
+            document.addEventListener('click', function(e) {
+                const cartSelect = document.getElementById('cartDiscountSelectDropdown');
+                const itemSelect = document.getElementById('itemDiscountSelectDropdown');
+                if (cartSelect && !e.target.closest('#cartDiscountSelectTrigger') && !e.target.closest('#cartDiscountSelectDropdown')) {
+                    cartSelect.classList.remove('show');
+                }
+                if (itemSelect && !e.target.closest('#itemDiscountSelectTrigger') && !e.target.closest('#itemDiscountSelectDropdown')) {
+                    itemSelect.classList.remove('show');
+                }
+            });
 
             const activeRules = checkRulesForCart();
             let total = 0;
@@ -3625,13 +3743,21 @@
 
         function openCartModal() {
             const modal = document.getElementById('cartModal');
-            if (modal) modal.style.display = 'block';
+            if (modal) {
+                modal.style.display = 'block';
+                discountPanelOpen = false;
+                const content = document.getElementById('discount-content');
+                const chevron = document.getElementById('discount-chevron');
+                if (content) content.style.display = 'none';
+                if (chevron) chevron.textContent = '▼';
+            }
             updateCartUI();
         }
 
         function closeCartModal() {
             const modal = document.getElementById('cartModal');
             if (modal) modal.style.display = 'none';
+            closeDiscountPanel();
         }
 
         async function updateStock(index, delta, silent = false) {
@@ -4031,10 +4157,14 @@
                         </div>
                         <div class="stock-row">
                             <span class="stock">Остаток: ${stock} шт</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total">📦 Всего: ${total} шт</span>
                             <button class="edit-icon" onclick="openEditProductModal(${originalIndex})">✏️</button>
                         </div>
-                        <div class="total">📦 Всего: ${total} шт</div>
-                        <div class="price">💰 Цена: ${price} ₽</div>
+                        <div class="price-row">
+                            <span class="price">💰 Цена: ${price} ₽</span>
+                        </div>
                     </div>
                     <div class="buttons">
                         <button class="minus" data-index="${originalIndex}" data-delta="-1">−1</button>
@@ -4054,6 +4184,7 @@
             });
             updateCartBadges();
         }
+
         function handleAddToCart(e) {
             const btn = e.currentTarget;
             const index = parseInt(btn.dataset.index);
