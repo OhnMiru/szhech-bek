@@ -99,6 +99,7 @@
             transition: background 0.3s ease, color 0.2s ease;
         }
 
+        /* Шапка с кнопкой темы на одном уровне */
         .header-row {
             display: flex;
             align-items: center;
@@ -137,6 +138,7 @@
             font-size: 13px;
         }
 
+        /* Кнопка смены темы */
         .theme-toggle {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -149,6 +151,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 8px var(--shadow);
+            transition: all 0.2s ease;
             flex-shrink: 0;
         }
 
@@ -156,6 +159,7 @@
             transform: scale(0.95);
         }
 
+        /* Toast уведомление */
         .toast-notification {
             position: fixed;
             top: 70px;
@@ -197,6 +201,7 @@
             }
         }
 
+        /* КНОПКА КОРЗИНЫ */
         .cart-fab {
             position: fixed;
             bottom: 80px;
@@ -344,6 +349,7 @@
             z-index: 10;
         }
 
+        /* Стиль для мультиселекта типов */
         .type-select-list {
             max-height: 250px;
             overflow-y: auto;
@@ -409,6 +415,7 @@
             color: white;
         }
 
+        /* Стили для сортировки */
         .sort-option {
             padding: 10px 12px;
             cursor: pointer;
@@ -447,6 +454,7 @@
             transform: scale(0.96);
         }
 
+        /* Карточка товара */
         .card {
             background: var(--card-bg);
             border-radius: 14px;
@@ -466,6 +474,7 @@
             background: var(--out-of-stock-bg);
         }
 
+        /* Бейдж с количеством в корзине */
         .cart-qty-badge {
             position: absolute;
             top: 8px;
@@ -495,6 +504,7 @@
             margin-bottom: 4px;
         }
 
+        /* Цветные бейджи для типов */
         .type-badge {
             display: inline-block;
             padding: 2px 8px;
@@ -713,6 +723,7 @@
             }
         }
 
+        /* Модальные окна */
         .modal {
             display: none;
             position: fixed;
@@ -774,6 +785,7 @@
             clear: both;
         }
 
+        /* История */
         .history-item {
             border-bottom: 1px solid var(--border-color);
             padding: 12px 0;
@@ -897,6 +909,7 @@
             color: white;
         }
 
+        /* ========== ФИЛЬТРЫ ИСТОРИИ ========== */
         .history-filters {
             display: flex;
             flex-direction: column;
@@ -963,6 +976,7 @@
             border-color: var(--btn-bg);
         }
 
+        /* Нижняя строка: фильтр суммы */
         .history-filter-bottom {
             display: flex;
             flex-direction: column;
@@ -978,6 +992,7 @@
             flex: 1;
         }
 
+        /* Отдельная строка для кнопки сброса */
         .history-filter-reset-row {
             display: flex;
             justify-content: flex-end;
@@ -1004,6 +1019,7 @@
             background: var(--badge-bg);
         }
 
+        /* Кастомные поля даты и времени */
         .custom-datetime {
             display: flex;
             align-items: center;
@@ -1050,6 +1066,7 @@
             font-size: 11px;
         }
 
+        /* Поля даты */
         .history-date-input {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -1069,6 +1086,7 @@
             opacity: 0.6;
         }
 
+        /* Блок суммы */
         .history-price-filter {
             display: flex;
             align-items: center;
@@ -1127,6 +1145,7 @@
             color: var(--text-muted);
         }
 
+        /* Кастомные селекты для правил */
         .rule-custom-select {
             position: relative;
             width: 100%;
@@ -1188,6 +1207,7 @@
             background: var(--badge-bg);
         }
 
+        /* Множественный выбор товаров */
         .multi-select-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -1275,6 +1295,7 @@
             border-color: var(--btn-bg);
         }
 
+        /* Стили для корзины */
         .cart-modal .modal-content {
             max-width: 500px;
         }
@@ -1403,6 +1424,7 @@
             color: var(--text-muted);
         }
 
+        /* Правила в корзине */
         .rule-text-bold {
             font-weight: bold;
         }
@@ -1411,6 +1433,7 @@
             font-weight: normal;
         }
 
+        /* Стили для стрелочек в разделе "По сумме" */
         .price-control {
             display: flex;
             align-items: center;
@@ -1448,6 +1471,7 @@
             transform: scale(0.95);
         }
 
+        /* Стили для статистики */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1653,11 +1677,11 @@
             margin-top: 20px;
         }
 
-        /* ========== СТИЛИ ДЛЯ СКИДОК ========== */
+        /* Стили для скидок */
         .discount-section {
             background: var(--badge-bg);
             border-radius: 16px;
-            padding: 6px 12px;
+            padding: 8px 12px;
             margin-bottom: 16px;
         }
 
@@ -1666,7 +1690,6 @@
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            padding: 2px 0;
         }
 
         .discount-title {
@@ -1683,7 +1706,6 @@
 
         .discount-content {
             margin-top: 10px;
-            padding-bottom: 4px;
         }
 
         .discount-group {
@@ -1704,9 +1726,10 @@
             flex-wrap: wrap;
         }
 
+        /* Кастомный селект для типа скидки */
         .discount-custom-select {
             position: relative;
-            min-width: 70px;
+            min-width: 100px;
         }
 
         .discount-custom-select-trigger {
@@ -1758,6 +1781,7 @@
             background: var(--badge-bg);
         }
 
+        /* Поле суммы скидки с кнопками + и - */
         .discount-amount-control {
             display: flex;
             align-items: center;
@@ -1796,6 +1820,7 @@
             transform: scale(0.95);
         }
 
+        /* Кнопки скидок */
         .discount-buttons-row {
             display: flex;
             gap: 8px;
@@ -1806,16 +1831,12 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 30px;
-            padding: 6px 8px;
+            padding: 4px 8px;
             font-size: 12px;
             cursor: pointer;
             color: var(--text-primary);
             text-align: center;
             transition: all 0.2s;
-            height: 34px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .discount-action-btn:hover {
@@ -1836,11 +1857,19 @@
             flex: 2;
         }
 
+        /* Кнопка "Товары" */
+        .discount-products-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
         .discount-products-btn {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 30px;
-            padding: 6px 20px;
+            padding: 6px 16px;
             font-size: 12px;
             cursor: pointer;
             color: var(--text-primary);
@@ -1849,13 +1878,13 @@
             height: 34px;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
         }
 
         .discount-products-btn:hover {
             background: var(--badge-bg);
         }
 
+        /* Список выбора товаров для скидки */
         .product-select-list {
             max-height: 150px;
             overflow-y: auto;
@@ -1887,6 +1916,7 @@
             margin-left: 8px;
         }
 
+        /* Стили для редактирования товара */
         .edit-product-modal .modal-content {
             max-width: 400px;
         }
@@ -2088,6 +2118,7 @@
             }
         }
 
+        /* Цвета для тёмной темы статистики */
         body.dark .stats-card-value,
         body.dark .detail-table td,
         body.dark .detail-table th,
@@ -2356,13 +2387,12 @@
         let typeOptions = [];
 
         let cartDiscount = {
-            type: 'percent',
-            value: 10
+            type: 'none',
+            value: 0
         };
         let selectedDiscountProducts = new Set();
         let discountProductListVisible = false;
         let itemDiscounts = {};
-        let discountPanelOpen = false;
 
         let typeColors = new Map();
         const colorPalette = ['#e67e22', '#f39c12', '#2ecc71', '#3498db', '#9b59b6', '#e74c3c', '#1abc9c', '#f1c40f', '#e67e22', '#95a5a6'];
@@ -2413,6 +2443,8 @@
         }
 
         // ========== СКИДКИ ==========
+        let discountPanelOpen = false;
+
         function toggleDiscountPanel() {
             discountPanelOpen = !discountPanelOpen;
             const content = document.getElementById('discount-content');
@@ -2433,7 +2465,7 @@
             if (chevron) chevron.textContent = '▼';
         }
 
-        // Закрытие выпадающих списков при клике вне (но не закрытие всей панели!)
+        // Закрытие выпадающих списков при клике вне
         document.addEventListener('click', function(e) {
             const cartSelect = document.getElementById('cartDiscountSelectDropdown');
             const itemSelect = document.getElementById('itemDiscountSelectDropdown');
@@ -2448,11 +2480,7 @@
         // Кастомный селект для типа скидки на корзину
         function toggleCartDiscountSelect() {
             const dropdown = document.getElementById('cartDiscountSelectDropdown');
-            if (dropdown) {
-                const itemDropdown = document.getElementById('itemDiscountSelectDropdown');
-                if (itemDropdown) itemDropdown.classList.remove('show');
-                dropdown.classList.toggle('show');
-            }
+            if (dropdown) dropdown.classList.toggle('show');
         }
 
         function selectCartDiscountType(type, label) {
@@ -2462,24 +2490,17 @@
             const dropdown = document.getElementById('cartDiscountSelectDropdown');
             if (dropdown) dropdown.classList.remove('show');
             const valueInput = document.getElementById('cartDiscountValue');
-            if (valueInput) {
-                if (type === 'percent') {
-                    valueInput.placeholder = '%';
-                    valueInput.step = 1;
-                    if (cartDiscount.value === 0) cartDiscount.value = 10;
-                } else {
-                    valueInput.placeholder = '₽';
-                    valueInput.step = 100;
-                    if (cartDiscount.value === 0) cartDiscount.value = 500;
-                }
-                valueInput.value = cartDiscount.value;
+            if (valueInput) valueInput.disabled = (type === 'none');
+            if (type === 'none') {
+                cartDiscount.value = 0;
+                if (valueInput) valueInput.value = 0;
             }
             updateCartUI();
         }
 
         function changeDiscountValue(delta) {
             const input = document.getElementById('cartDiscountValue');
-            if (input) {
+            if (input && !input.disabled) {
                 let val = parseFloat(input.value) || 0;
                 let step = (cartDiscount.type === 'percent') ? 1 : 100;
                 val = Math.max(0, val + delta * step);
@@ -2491,7 +2512,7 @@
 
         function updateCartDiscountFromInput() {
             const input = document.getElementById('cartDiscountValue');
-            if (input) {
+            if (input && !input.disabled) {
                 cartDiscount.value = parseFloat(input.value) || 0;
                 updateCartUI();
             }
@@ -2499,29 +2520,24 @@
 
         function resetCartDiscount() {
             cartDiscount = {
-                type: 'percent',
-                value: 10
+                type: 'none',
+                value: 0
             };
             const trigger = document.getElementById('cartDiscountSelectTrigger');
-            if (trigger) trigger.textContent = '%';
+            if (trigger) trigger.textContent = 'Без скидки';
             const valueInput = document.getElementById('cartDiscountValue');
             if (valueInput) {
-                valueInput.value = 10;
-                valueInput.placeholder = '%';
-                valueInput.step = 1;
+                valueInput.value = 0;
+                valueInput.disabled = true;
             }
+            closeDiscountPanel();
             updateCartUI();
-            showToast("Скидка на корзину сброшена до 10%", true);
         }
 
         // Кастомный селект для типа скидки на товары
         function toggleItemDiscountSelect() {
             const dropdown = document.getElementById('itemDiscountSelectDropdown');
-            if (dropdown) {
-                const cartDropdown = document.getElementById('cartDiscountSelectDropdown');
-                if (cartDropdown) cartDropdown.classList.remove('show');
-                dropdown.classList.toggle('show');
-            }
+            if (dropdown) dropdown.classList.toggle('show');
         }
 
         function selectItemDiscountType(type, label) {
@@ -2569,10 +2585,6 @@
             const value = parseFloat(document.getElementById('itemDiscountValue').value) || 0;
             if (selectedDiscountProducts.size === 0) {
                 showToast("Выберите товары для скидки", false);
-                return;
-            }
-            if (value <= 0) {
-                showToast("Введите корректную сумму скидки", false);
                 return;
             }
             for (const productName of selectedDiscountProducts) {
@@ -3486,19 +3498,19 @@
                     <div class="stats-card"><div class="stats-card-value">${formatCurrency(averageCheck)}</div><div class="stats-card-label">💳 Средний чек</div></div>
                 </div>
                 <div class="stats-summary-compact"><div class="stats-summary-value ${profitMargin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(profitMargin)}</div><div class="stats-summary-label">Рентабельность продаж</div></div>
-                <div class="detail-section"><div class="detail-title">📦 Детализация по товарам</div><table class="detail-table"><thead><tr><th>Товар</th><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Себест.</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th></tr></thead><tbody>
+                <div class="detail-section"><div class="detail-title">📦 Детализация по товарам</div><table class="detail-table"><thead><tr><th>Товар</th><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Себест.</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th><tr></thead><tbody>
                     ${productDetails.map(p => `<tr><td>${escapeHtml(p.name)}</td><td><span class="type-badge" style="background:${getTypeColor(p.type)}20; color:${getTypeColor(p.type)};">${escapeHtml(p.type)}</span></td><td class="text-right">${p.qty} шт</td><td class="text-right">${formatCurrency(p.revenue)}</td><td class="text-right">${formatCurrency(p.totalCost)}</td><td class="text-right ${p.profit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(p.profit)}</td><td class="text-right ${p.margin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(p.margin)}</td></tr>`).join('')}
-                </tbody>在美国</div>
+                </tbody></table></div>
                 <div class="detail-section"><div class="detail-title">🏷️ Детализация по типам мерча</div><table class="detail-table"><thead><tr><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Себест.</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th></tr></thead><tbody>
                     ${typeDetails.map(t => `<tr><td><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td><td class="text-right">${t.qty} шт</td><td class="text-right">${formatCurrency(t.revenue)}</td><td class="text-right">${formatCurrency(t.totalCost)}</td><td class="text-right ${t.profit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(t.profit)}</td><td class="text-right ${t.margin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(t.margin)}</td></tr>`).join('')}
-                </tbody>在美国</div>
+                </tbody></table></div>
                 <div class="two-columns">
                     <div class="detail-section"><div class="detail-title">🏆 Самые популярные товары</div><table class="detail-table"><thead><tr><th>#</th><th>Товар</th><th>Тип</th><th class="text-right">Продано, шт</th></tr></thead><tbody>
                         ${topByQty.map(([name, data], idx) => `<tr><td class="text-right"><span class="popular-badge">${idx+1}</span></td><td>${escapeHtml(name)}</td><td><span class="type-badge" style="background:${getTypeColor(data.type)}20; color:${getTypeColor(data.type)};">${escapeHtml(data.type)}</span></td><td class="text-right">${data.qty} шт</td></tr>`).join('')}
-                    </tbody>在美国</div>
+                    </tbody></table></div>
                     <div class="detail-section"><div class="detail-title">🏆 Самые популярные типы мерча</div><table class="detail-table"><thead><tr><th>#</th><th>Тип</th><th class="text-right">Продано, шт</th></tr></thead><tbody>
                         ${topTypesByQty.map(([type, data], idx) => `<tr><td class="text-right"><span class="popular-badge">${idx+1}</span></td><td><span class="type-badge" style="background:${getTypeColor(type)}20; color:${getTypeColor(type)};">${escapeHtml(type)}</span></td><td class="text-right">${data.qty} шт</td></tr>`).join('')}
-                    </tbody>在美国</div>
+                    </tbody></table></div>
                 </div>
                 <div class="extra-costs-section"><div class="detail-title">➕ Дополнительные расходы</div><div id="extra-costs-list">
                     ${extraCosts.length === 0 ? '<div style="color: var(--text-muted); text-align: center; padding: 12px;">Нет дополнительных расходов</div>' : ''}
@@ -3593,15 +3605,16 @@
                             <div class="discount-group-title">Скидка на всю корзину</div>
                             <div class="discount-row">
                                 <div class="discount-custom-select">
-                                    <div class="discount-custom-select-trigger" id="cartDiscountSelectTrigger" onclick="event.stopPropagation(); toggleCartDiscountSelect()">${cartDiscount.type === 'percent' ? '%' : '₽'}</div>
+                                    <div class="discount-custom-select-trigger" id="cartDiscountSelectTrigger" onclick="event.stopPropagation(); toggleCartDiscountSelect()">Без скидки</div>
                                     <div class="discount-custom-select-dropdown" id="cartDiscountSelectDropdown">
+                                        <div class="discount-select-option" onclick="selectCartDiscountType('none', 'Без скидки')">Без скидки</div>
                                         <div class="discount-select-option" onclick="selectCartDiscountType('percent', '%')">%</div>
                                         <div class="discount-select-option" onclick="selectCartDiscountType('fixed', '₽')">₽</div>
                                     </div>
                                 </div>
                                 <div class="discount-amount-control">
-                                    <input type="number" id="cartDiscountValue" class="discount-amount-input" value="${cartDiscount.value}" onchange="updateCartDiscountFromInput()" step="${cartDiscount.type === 'percent' ? 1 : 100}">
                                     <button class="discount-step-btn" onclick="changeDiscountValue(-1)">−</button>
+                                    <input type="number" id="cartDiscountValue" class="discount-amount-input" value="0" ${cartDiscount.type === 'none' ? 'disabled' : ''} onchange="updateCartDiscountFromInput()">
                                     <button class="discount-step-btn" onclick="changeDiscountValue(1)">+</button>
                                 </div>
                             </div>
@@ -3741,8 +3754,8 @@
         function clearCart() {
             cart = {};
             cartDiscount = {
-                type: 'percent',
-                value: 10
+                type: 'none',
+                value: 0
             };
             itemDiscounts = {};
             selectedDiscountProducts.clear();
@@ -3854,8 +3867,8 @@
             closeCartModal();
             cart = {};
             cartDiscount = {
-                type: 'percent',
-                value: 10
+                type: 'none',
+                value: 0
             };
             itemDiscounts = {};
             selectedDiscountProducts.clear();
