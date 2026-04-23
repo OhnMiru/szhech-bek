@@ -10,7 +10,6 @@
             user-select: none;
         }
 
-        /* ========== ЖЁЛТО-ОРАНЖЕВАЯ СВЕТЛАЯ ТЕМА ========== */
         :root {
             --bg-color: #fff5e0;
             --card-bg: #ffffff;
@@ -50,7 +49,6 @@
             --extra-costs-text-dark: #ffffff;
         }
 
-        /* ========== ТЁМНАЯ ТЕМА ========== */
         body.dark {
             --bg-color: #1e1708;
             --card-bg: #2a2110;
@@ -1397,26 +1395,33 @@
 
         .cart-clear {
             flex: 1;
-            background: var(--reset-bg);
-            color: var(--reset-color);
+            background: #e74c3c;
+            color: white;
             width: auto;
             padding: 12px;
             font-size: 14px;
             border-radius: 30px;
             border: none;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .cart-gift {
-            flex: 1;
-            background: var(--minus-bg);
-            color: var(--minus-color);
-            width: auto;
+            flex: 0 0 auto;
+            width: 54px;
+            background: var(--reset-bg);
+            color: var(--reset-color);
             padding: 12px;
-            font-size: 20px;
+            font-size: 24px;
             border-radius: 30px;
             border: 1px solid var(--border-color);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .empty-cart {
@@ -1676,13 +1681,12 @@
             margin-top: 20px;
         }
 
-        /* ========== СТИЛИ ДЛЯ СКИДОК ========== */
         .discount-section {
             background: var(--badge-bg);
             border-radius: 16px;
             margin-bottom: 16px;
-            border-left: 4px solid var(--btn-bg);
             overflow: hidden;
+            border: 1px solid var(--btn-bg);
         }
 
         .discount-header {
@@ -1887,6 +1891,26 @@
         }
 
         .discount-all-btn:hover {
+            background: var(--badge-bg);
+        }
+
+        .discount-none-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 5px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            color: #5a3a1a;
+            text-align: center;
+            white-space: nowrap;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discount-none-btn:hover {
             background: var(--badge-bg);
         }
 
@@ -2158,7 +2182,8 @@
         body.dark .edit-input,
         body.dark .discount-action-btn,
         body.dark .discount-products-btn,
-        body.dark .discount-all-btn {
+        body.dark .discount-all-btn,
+        body.dark .discount-none-btn {
             color: #f5e6c4 !important;
         }
 
@@ -2234,7 +2259,7 @@
             Намяукано | <a href="https://docs.google.com/spreadsheets/d/12b52PdQfgsN_8jwZRpOEbZSMWoYj3s1CRHqA2As24U4/edit" target="_blank">Синхронизация с таблицей</a>
         </div>
     </div>
-    <!-- Модалка корзины -->
+
     <div id="cartModal" class="modal cart-modal">
         <div class="modal-content">
             <button class="modal-close-btn" onclick="closeCartModal()">×</button>
@@ -2248,41 +2273,34 @@
             <div id="cart-total" class="cart-total" style="display:none;">Итого: 0 ₽</div>
             <div class="cart-actions" id="cart-actions" style="display:none;">
                 <button class="cart-gift" onclick="giftCart()">🎁</button>
-                <button class="cart-clear" onclick="clearCart()">Очистить</button>
+                <button class="cart-clear" onclick="clearCart()">❌ Очистить</button>
                 <button class="cart-checkout" onclick="checkout()">✅ Продать всё</button>
             </div>
         </div>
     </div>
 
-    <!-- Модалка правил -->
     <div id="rulesModal" class="modal">
         <div class="modal-content" style="max-width: 550px;">
             <button class="modal-close-btn" onclick="closeRulesModal()">×</button>
             <div class="modal-header">
                 <span>📋 Правила для продавца</span>
             </div>
-
             <div class="rule-type-buttons">
                 <button class="rule-type-btn" data-type="type" onclick="selectRuleType('type')">📦 По типу</button>
                 <button class="rule-type-btn" data-type="product" onclick="selectRuleType('product')">🏷️ По товару</button>
                 <button class="rule-type-btn" data-type="price" onclick="selectRuleType('price')">💰 По сумме</button>
                 <button class="rule-type-btn" data-type="bonus" onclick="selectRuleType('bonus')">💵 Бонус</button>
             </div>
-
             <div id="ruleTypeContent"></div>
-
             <button onclick="addStructuredRule()" style="background: var(--btn-bg); color: white; width: 100%; padding: 12px; border-radius: 30px; border: none; font-size: 14px; margin-top: 8px; cursor: pointer;">➕ Добавить правило</button>
-
             <div style="font-weight: bold; margin: 20px 0 12px 0;">📋 Список правил</div>
             <div id="rules-list" style="max-height: 300px; overflow-y: auto;">
                 <div class="empty-cart">📭 Нет добавленных правил. Создайте новое!</div>
             </div>
-
             <button onclick="deleteAllRules()" style="background: var(--minus-bg); color: var(--minus-color); width: 100%; padding: 12px; border-radius: 30px; border: none; font-size: 14px; margin-top: 12px; cursor: pointer;">🗑 Удалить все правила</button>
         </div>
     </div>
 
-    <!-- Модалка истории -->
     <div id="historyModal" class="modal">
         <div class="modal-content" style="max-width: 550px;">
             <button class="modal-close-btn" onclick="closeHistory()">×</button>
@@ -2355,7 +2373,6 @@
         </div>
     </div>
 
-    <!-- Модалка статистики -->
     <div id="statsModal" class="modal">
         <div class="modal-content" style="max-width: 800px;">
             <button class="modal-close-btn" onclick="closeStatsModal()">×</button>
@@ -2368,7 +2385,6 @@
         </div>
     </div>
 
-    <!-- Модалка редактирования товара -->
     <div id="editProductModal" class="modal edit-product-modal">
         <div class="modal-content">
             <button class="modal-close-btn" onclick="closeEditProductModal()">×</button>
@@ -2391,6 +2407,7 @@
             </div>
         </div>
     </div>
+
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzTy-EPlVQ5HYDbqCMdZ0fj10j5SzQ0EDJWmIjBhaBO_rKFaUZJIj4TQe9DZEcTd67aug/exec";
         const CORRECT_PASSWORD = "банан";
@@ -2406,14 +2423,9 @@
         let currentSortBy = "none";
         let typeOptions = [];
 
-        // Для пользовательской сортировки
         let customOrder = [];
-        let isCustomSortMode = false;
-
-        // Для перетаскивания
         let dragStartIndex = null;
 
-        // Скидки
         let selectedDiscountProducts = new Set();
         let discountProductListVisible = false;
         let itemDiscounts = {};
@@ -2430,7 +2442,6 @@
             return typeColors.get(type);
         }
 
-        // ========== РЕДАКТИРОВАНИЕ ТОВАРА ==========
         function openEditProductModal(index) {
             currentEditIndex = index;
             const card = originalCardsData[index];
@@ -2467,7 +2478,6 @@
             showToast(`Товар "${card.name}" обновлён`, true);
         }
 
-        // ========== СКИДКИ ==========
         function toggleDiscountPanel() {
             discountPanelOpen = !discountPanelOpen;
             const content = document.getElementById('discount-content');
@@ -2488,7 +2498,6 @@
             if (chevron) chevron.textContent = '▼';
         }
 
-        // Закрытие выпадающих списков при клике вне
         document.addEventListener('click', function(e) {
             const itemSelect = document.getElementById('itemDiscountSelectDropdown');
             if (itemSelect && !e.target.closest('#itemDiscountSelectTrigger') && !e.target.closest('#itemDiscountSelectDropdown')) {
@@ -2496,7 +2505,6 @@
             }
         });
 
-        // Кастомный селект для типа скидки на товары
         function toggleItemDiscountSelect() {
             const dropdown = document.getElementById('itemDiscountSelectDropdown');
             if (dropdown) dropdown.classList.toggle('show');
@@ -2511,7 +2519,6 @@
             if (dropdown) dropdown.classList.remove('show');
         }
 
-        // Показываем только товары, которые есть в корзине
         function renderProductDiscountList() {
             const container = document.getElementById('productDiscountList');
             if (!container) return;
@@ -2554,7 +2561,6 @@
             if (discountProductListVisible) renderProductDiscountList();
         }
 
-        // Выбрать все товары в корзине
         function selectAllProductsForDiscount() {
             selectedDiscountProducts.clear();
             for (const [idxStr, qty] of Object.entries(cart)) {
@@ -2568,7 +2574,12 @@
             showToast(`Выбрано ${selectedDiscountProducts.size} товаров`, true);
         }
 
-        // Изменение значения скидки с учётом типа (кнопки - и +)
+        function selectNoneProductsForDiscount() {
+            selectedDiscountProducts.clear();
+            renderProductDiscountList();
+            showToast(`Выбор товаров сброшен`, true);
+        }
+
         function changeItemDiscountValue(delta) {
             const input = document.getElementById('itemDiscountValue');
             if (input) {
@@ -2590,7 +2601,6 @@
             }
         }
 
-        // Применение скидки на выбранные товары
         function applyItemDiscount() {
             const typeSelect = document.getElementById('itemDiscountTypeSelect');
             const type = typeSelect ? typeSelect.getAttribute('data-value') || 'percent' : 'percent';
@@ -2629,7 +2639,6 @@
             showToast("Скидки на товары сброшены", true);
         }
 
-        // ========== ДОПОЛНИТЕЛЬНЫЕ РАСХОДЫ ==========
         let extraCosts = [];
 
         async function syncExtraCostsToServer() {
@@ -2696,7 +2705,7 @@
             saveExtraCosts();
             if (document.getElementById('statsModal')?.style.display === 'block') renderStats();
         }
-        // ========== ИСТОРИЯ ==========
+
         let salesHistory = [];
         let historyMethodFilter = "all";
         let historyTypeFilter = "all";
@@ -2824,7 +2833,6 @@
             }
         }
 
-        // ========== ПРАВИЛА ==========
         let rulesList = [];
         let currentRuleType = "type";
         let selectedProducts = new Set();
@@ -2905,7 +2913,6 @@
             }
         }
 
-        // ========== ДАТА И ВРЕМЯ ДЛЯ ФИЛЬТРОВ ==========
         function initDateTimeSelects() {
             const currentYear = new Date().getFullYear();
             const years = [];
@@ -3094,7 +3101,7 @@
             }
             container.innerHTML = html;
         }
-        // ========== ФУНКЦИИ ПРАВИЛ (UI) ==========
+
         function selectRuleType(type) {
             currentRuleType = type;
             selectedProducts.clear();
@@ -3397,7 +3404,7 @@
             }
             return activeRules;
         }
-        // ========== СТАТИСТИКА ==========
+
         function openStatsModal() {
             const modal = document.getElementById('statsModal');
             if (modal) {
@@ -3621,7 +3628,7 @@
             if (amountInput) amountInput.value = '0';
             renderStats();
         }
-        // ========== КОРЗИНА ==========
+
         let cart = {};
 
         function showToast(message, isSuccess = true) {
@@ -3660,12 +3667,10 @@
             });
         }
 
-        // Функция для получения наибольшей скидки для товара
         function getBestDiscountForItem(idx, originalPrice, qty, subtotal) {
             let finalPrice = originalPrice;
             let discountPercent = 0;
 
-            // Скидка на конкретный товар
             if (itemDiscounts[idx]) {
                 const disc = itemDiscounts[idx];
                 if (disc.type === 'percent') {
@@ -3688,14 +3693,13 @@
             const cartItemsDiv = document.getElementById('cart-items-list');
             const cartTotalDiv = document.getElementById('cart-total');
             const cartActionsDiv = document.getElementById('cart-actions');
-            const discountPanel = document.getElementById('discount-panel');
+            const discountPanelDiv = document.getElementById('discount-panel');
 
             if (!cartItemsDiv) return;
             const hasAny = Object.keys(cart).length > 0;
 
-            // Показываем/скрываем панель скидок
-            if (discountPanel) {
-                discountPanel.style.display = hasAny ? 'block' : 'none';
+            if (discountPanelDiv) {
+                discountPanelDiv.style.display = hasAny ? 'block' : 'none';
             }
 
             if (!hasAny) {
@@ -3706,7 +3710,6 @@
                 return;
             }
 
-            // Рендер панели скидок
             let discountHtml = `
                 <div class="discount-section">
                     <div class="discount-header" onclick="toggleDiscountPanel()">
@@ -3731,10 +3734,10 @@
                                 </div>
                                 <button class="discount-products-btn" onclick="toggleDiscountProductsList()">Товары</button>
                                 <button class="discount-all-btn" onclick="selectAllProductsForDiscount()">Всё</button>
+                                <button class="discount-none-btn" onclick="selectNoneProductsForDiscount()">Ничего</button>
                             </div>
                             <div id="productDiscountList" style="display: none; margin-top: 8px;"></div>
                         </div>
-
                         <div class="discount-buttons-row">
                             <button class="discount-action-btn cancel-btn" onclick="closeDiscountPanel()">Отмена</button>
                             <button class="discount-action-btn reset-btn" onclick="resetItemDiscounts()">Сбросить скидки</button>
@@ -3743,7 +3746,7 @@
                     </div>
                 </div>
             `;
-            if (discountPanel) discountPanel.innerHTML = discountHtml;
+            if (discountPanelDiv) discountPanelDiv.innerHTML = discountHtml;
 
             const activeRules = checkRulesForCart();
             let total = 0;
@@ -3859,7 +3862,6 @@
             showToast(`Корзина очищена`, true);
         }
 
-        // Подарок (списание товаров с ценой 0)
         function giftCart() {
             const items = Object.entries(cart).filter(([_, qty]) => qty > 0);
             if (items.length === 0) {
@@ -3876,7 +3878,6 @@
                 }
             }
 
-            // Добавляем в историю как подарок (цена 0)
             const historyItems = items.map(([idxStr, qty]) => {
                 const idx = parseInt(idxStr);
                 const card = originalCardsData[idx];
@@ -3953,6 +3954,7 @@
             const modal = document.getElementById('cartModal');
             if (modal) modal.style.display = 'none';
         }
+
         async function updateStock(index, delta, silent = false) {
             const card = originalCardsData[index];
             if (!card) return;
@@ -4086,7 +4088,6 @@
             showToast(`Продажа на ${Math.max(0, total).toFixed(2)} ₽ завершена!`, true);
         }
 
-        // ========== ФИЛЬТР ТИПОВ ==========
         let tempSelectedTypes = new Set();
 
         function updateTypeFilterTrigger() {
@@ -4157,10 +4158,7 @@
             }
         }
 
-        // ========== СОРТИРОВКА ==========
-        // Функция сортировки по релевантности (наибольшая выручка)
         function sortByRevenue(data) {
-            // Сначала собираем данные о выручке по товарам из истории продаж
             const revenueMap = new Map();
             const sales = salesHistory.filter(entry => !entry.isReturn);
             for (const sale of sales) {
@@ -4170,18 +4168,15 @@
                 }
             }
             
-            // Сортируем: сначала товары с выручкой (в порядке убывания), затем нулевые
             return [...data].sort((a, b) => {
                 const revenueA = revenueMap.get(a.name) || 0;
                 const revenueB = revenueMap.get(b.name) || 0;
                 const isOutOfStockA = (a.stock || 0) === 0;
                 const isOutOfStockB = (b.stock || 0) === 0;
                 
-                // Закончившиеся товары внизу
                 if (isOutOfStockA && !isOutOfStockB) return 1;
                 if (!isOutOfStockA && isOutOfStockB) return -1;
                 
-                // Сортируем по выручке (убывание)
                 return revenueB - revenueA;
             });
         }
@@ -4200,6 +4195,31 @@
             if (order.length === originalCardsData.length) {
                 customOrder = order;
                 localStorage.setItem('merch_custom_order', JSON.stringify(customOrder));
+                syncCustomOrderToServer();
+            }
+        }
+
+        async function syncCustomOrderToServer() {
+            try {
+                const data = encodeURIComponent(JSON.stringify(customOrder));
+                await fetch(`${API_URL}?action=syncCustomOrder&data=${data}&t=${Date.now()}`);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadCustomOrderFromServer() {
+            try {
+                const response = await fetch(`${API_URL}?action=getCustomOrder&t=${Date.now()}`);
+                const data = await response.json();
+                if (data && data.order && Array.isArray(data.order)) {
+                    customOrder = data.order;
+                    localStorage.setItem('merch_custom_order', JSON.stringify(customOrder));
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                return false;
             }
         }
 
@@ -4213,6 +4233,13 @@
                 }
             } else {
                 customOrder = [];
+            }
+        }
+
+        async function initCustomOrder() {
+            const loaded = await loadCustomOrderFromServer();
+            if (!loaded) {
+                loadCustomOrder();
             }
         }
 
@@ -4230,7 +4257,6 @@
             return ordered;
         }
 
-        // Функции для перетаскивания
         function dragStartHandler(e, index) {
             dragStartIndex = index;
             e.target.closest('.card')?.classList.add('dragging');
@@ -4271,6 +4297,7 @@
                 });
                 customOrder = newOrder;
                 localStorage.setItem('merch_custom_order', JSON.stringify(customOrder));
+                syncCustomOrderToServer();
             }
             dragStartIndex = null;
         }
@@ -4287,7 +4314,6 @@
                 filtered = filtered.filter(card => selectedTypes.has(card.type));
             }
 
-            // Применяем сортировку
             if (currentSortBy !== 'none') {
                 switch (currentSortBy) {
                     case 'name':
@@ -4442,10 +4468,10 @@
                         sortTrigger.textContent = opt.label;
 
                         if (currentSortBy === 'custom') {
-                            loadCustomOrder();
+                            initCustomOrder().then(() => filterAndSort());
+                        } else {
+                            filterAndSort();
                         }
-
-                        filterAndSort();
                         sortDropdown.classList.remove('show');
                     };
                     sortDropdown.appendChild(div);
@@ -4670,7 +4696,6 @@
             filterAndSort();
         }
 
-        // ========== АУТЕНТИФИКАЦИЯ ==========
         function checkPasswordAndLogin() {
             const passwordInput = document.getElementById('passwordInput');
             const errorMsg = document.getElementById('errorMsg');
@@ -4687,6 +4712,7 @@
                 loadExtraCosts();
                 initDateTimeSelects();
                 bindDateTimeEvents();
+                initCustomOrder();
                 loadData(true, true);
                 startAutoRefresh();
                 startHistoryAutoSync();
@@ -4710,6 +4736,7 @@
                 loadExtraCosts();
                 initDateTimeSelects();
                 bindDateTimeEvents();
+                initCustomOrder();
                 loadData(true, true);
                 startAutoRefresh();
                 startHistoryAutoSync();
@@ -4720,7 +4747,6 @@
             }
         }
 
-        // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
         document.addEventListener('click', function(event) {
             if (!event.target.closest('.rule-custom-select')) {
                 closeAllRuleSelects();
@@ -4735,7 +4761,6 @@
             if (event.target === document.getElementById('editProductModal')) closeEditProductModal();
         };
 
-        // ========== ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ ==========
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
 
