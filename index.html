@@ -1051,6 +1051,7 @@
             border-radius: 20px;
             padding: 4px 12px;
             height: 34px;
+            flex-wrap: wrap;
         }
 
         .custom-datetime .datetime-label {
@@ -1086,6 +1087,23 @@
         .datetime-sep {
             color: var(--text-muted);
             font-size: 11px;
+        }
+
+        @media (max-width: 500px) {
+            .custom-datetime {
+                flex-direction: column;
+                align-items: flex-start;
+                height: auto;
+                gap: 8px;
+            }
+            .datetime-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .datetime-select {
+                flex: 1;
+                text-align: center;
+            }
         }
 
         .history-date-input {
@@ -1573,6 +1591,38 @@
             font-size: 11px;
             color: var(--text-muted);
             font-weight: bold;
+        }
+
+        .filter-toggle {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--badge-bg);
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .filter-toggle .chevron {
+            transition: transform 0.2s;
+        }
+
+        .filter-toggle.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .stats-filter-panel {
+            display: none;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: var(--badge-bg);
+            border-radius: 16px;
+        }
+
+        .stats-filter-panel.open {
+            display: block;
         }
 
         .extra-costs-section {
@@ -2322,6 +2372,75 @@
             box-shadow: 0 2px 8px var(--shadow);
             flex-shrink: 0;
         }
+
+        .booking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .booking-item-info {
+            flex: 2;
+        }
+
+        .booking-item-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .booking-item-details {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .booking-sell-btn {
+            background: var(--btn-bg);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .booking-cancel-btn {
+            background: var(--minus-bg);
+            color: var(--minus-color);
+            border: none;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .nick-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: var(--badge-bg);
+            border-radius: 16px;
+        }
+
+        .nick-chip {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nick-chip.active {
+            background: var(--btn-bg);
+            color: white;
+            border-color: var(--btn-bg);
+        }
     </style>
 </head>
 <body>
@@ -2344,6 +2463,7 @@
             <div id="errorMsg" style="color:var(--minus-color); font-size:12px; margin-top:12px; display:none;"></div>
         </div>
     </div>
+
     <!-- ОСНОВНОЙ КОНТЕНТ -->
     <div id="mainContent" style="display:none;">
         <div class="header-row">
@@ -2370,6 +2490,7 @@
             <button class="refresh-btn" id="rulesButton">📋 Правила</button>
             <button class="history-btn" onclick="showHistory()">📜 История</button>
             <button class="refresh-btn" id="statsButton">📊 Статистика</button>
+            <button class="refresh-btn" id="bookingButton">📅 Бронирование</button>
             <button class="refresh-btn" id="globalStatsBtn" style="display: none;">📊 Статистика всех</button>
         </div>
 
@@ -2404,7 +2525,6 @@
             Намяукано | <a id="sheetLink" href="#" target="_blank">Синхронизация с таблицей</a>
         </div>
     </div>
-
     <!-- Cart Modal -->
     <div id="cartModal" class="modal cart-modal">
         <div class="modal-content">
@@ -2527,6 +2647,43 @@
             <button class="modal-close-btn" onclick="closeStatsModal()">×</button>
             <div class="modal-header">
                 <span>📊 Статистика продаж</span>
+                <div class="filter-toggle" onclick="toggleStatsFilter()">
+                    <span>📅 Фильтр</span>
+                    <span class="chevron" id="statsFilterChevron">▼</span>
+                </div>
+            </div>
+            <div id="statsFilterPanel" class="stats-filter-panel">
+                <div class="custom-datetime" style="margin-bottom: 12px;">
+                    <span class="datetime-label">с</span>
+                    <div class="datetime-group">
+                        <select id="statsDateFromDay" class="datetime-select"></select>
+                        <span class="datetime-sep"> </span>
+                        <select id="statsDateFromMonth" class="datetime-select"></select>
+                        <span class="datetime-sep"> </span>
+                        <select id="statsDateFromYear" class="datetime-select"></select>
+                    </div>
+                    <div class="datetime-group">
+                        <select id="statsTimeFromHour" class="datetime-select"></select>
+                        <span class="datetime-sep">:</span>
+                        <select id="statsTimeFromMinute" class="datetime-select"></select>
+                    </div>
+                </div>
+                <div class="custom-datetime">
+                    <span class="datetime-label">по</span>
+                    <div class="datetime-group">
+                        <select id="statsDateToDay" class="datetime-select"></select>
+                        <span class="datetime-sep"> </span>
+                        <select id="statsDateToMonth" class="datetime-select"></select>
+                        <span class="datetime-sep"> </span>
+                        <select id="statsDateToYear" class="datetime-select"></select>
+                    </div>
+                    <div class="datetime-group">
+                        <select id="statsTimeToHour" class="datetime-select"></select>
+                        <span class="datetime-sep">:</span>
+                        <select id="statsTimeToMinute" class="datetime-select"></select>
+                    </div>
+                </div>
+                <button onclick="applyStatsFilter()" style="margin-top: 12px; width: 100%; background: var(--btn-bg); color: white; border: none; border-radius: 30px; padding: 8px; cursor: pointer;">Применить фильтр</button>
             </div>
             <div id="stats-content">
                 <div class="loading">Загрузка статистики...</div>
@@ -2547,7 +2704,28 @@
         </div>
     </div>
 
-    <!-- Edit Product Modal -->
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="modal-close-btn" onclick="closeBookingModal()">×</button>
+            <div class="modal-header">
+                <span>📅 Бронирование товаров</span>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <input type="text" id="bookingNick" class="rule-styled-input" placeholder="Ник покупателя" style="margin-bottom: 8px;">
+                <div id="bookingProductsSelect" class="custom-select" style="margin-bottom: 12px;">
+                    <div class="custom-select-trigger" id="bookingProductsTrigger">Выберите товары</div>
+                    <div class="custom-select-dropdown" id="bookingProductsDropdown" style="max-height: 200px;"></div>
+                </div>
+                <div id="bookingSelectedItems" style="margin-bottom: 12px;"></div>
+                <button onclick="addBooking()" style="background: var(--btn-bg); color: white; border: none; border-radius: 30px; padding: 10px; width: 100%; cursor: pointer;">📅 Забронировать</button>
+            </div>
+            <div id="bookingNicksList" class="nick-list"></div>
+            <div id="bookingItemsList"></div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal (обновлённый) -->
     <div id="editProductModal" class="modal edit-product-modal">
         <div class="modal-content">
             <button class="modal-close-btn" onclick="closeEditProductModal()">×</button>
@@ -2555,6 +2733,18 @@
                 <span>✏️ Редактирование товара</span>
             </div>
             <div id="edit-product-content">
+                <div class="edit-row">
+                    <span class="edit-label">ID</span>
+                    <input type="text" id="editId" class="edit-input" readonly>
+                </div>
+                <div class="edit-row">
+                    <span class="edit-label">Название</span>
+                    <input type="text" id="editName" class="edit-input" value="">
+                </div>
+                <div class="edit-row">
+                    <span class="edit-label">Тип</span>
+                    <input type="text" id="editType" class="edit-input" value="">
+                </div>
                 <div class="edit-row">
                     <span class="edit-label">Всего</span>
                     <input type="number" id="editTotal" class="edit-input" value="0">
@@ -2572,7 +2762,7 @@
     </div>
     <script>
         // ========== НАСТРОЙКА ==========
-        const CENTRAL_API_URL = "https://script.google.com/macros/s/AKfycbw923hazLi1T7BMJ2ditcyghMOYGE0ouwaNe6GanSsIIdlluVlQP5lnf_XvmvP4R4nD/exec";
+        const CENTRAL_API_URL = "https://script.google.com/macros/s/AKfycbwulyQPwrka76t8-1nJosL6voEy18PGudJXESxBR3TyOygKhP2KHIu-PiR-acDhJQ9X/exec";
         
         let CURRENT_USER = {
             id: null,
@@ -2585,6 +2775,14 @@
         
         let pendingOperations = [];
         let isOnline = navigator.onLine;
+        
+        // Дополнительная выручка (локальная)
+        let extraRevenues = [];
+        
+        // Бронирования
+        let bookingsList = [];
+        let currentBookingNick = null;
+        let bookingSelectedProducts = new Map(); // key: productId, value: { id, displayName, type, quantity, price }
         
         function buildApiUrl(action, extraParams = "") {
             if (!CURRENT_USER.id) return "#";
@@ -2650,6 +2848,7 @@
             showToast("Соединение восстановлено, синхронизация...", true);
             processPendingOperations();
             loadData(false, false);
+            loadBookings();
         });
         
         window.addEventListener('offline', () => {
@@ -2810,6 +3009,8 @@
                     
                     initApp();
                     processPendingOperations();
+                    loadBookings();
+                    loadExtraRevenues();
                 } else {
                     errorMsg.style.display = 'block';
                     errorMsg.textContent = result.error || 'Неверный логин или пароль';
@@ -2852,6 +3053,8 @@
                         loadPendingOperations();
                         initApp();
                         processPendingOperations();
+                        loadBookings();
+                        loadExtraRevenues();
                     });
                     return true;
                 } catch(e) {}
@@ -2885,6 +3088,7 @@
         let autoRefreshInterval = null;
         let historySyncInterval = null;
         let currentEditIndex = null;
+        let currentEditProductId = null;
         let selectedTypes = new Set();
         let currentSortBy = "none";
         let typeOptions = [];
@@ -2897,6 +3101,10 @@
         let typeColors = new Map();
         const colorPalette = ['#e67e22', '#f39c12', '#2ecc71', '#3498db', '#9b59b6', '#e74c3c', '#1abc9c', '#f1c40f', '#e67e22', '#95a5a6'];
         
+        // Фильтр статистики по датам
+        let statsFilterFrom = null;
+        let statsFilterTo = null;
+        
         function getTypeColor(type) {
             if (!typeColors.has(type)) {
                 const index = typeColors.size % colorPalette.length;
@@ -2905,192 +3113,408 @@
             return typeColors.get(type);
         }
         
-        // ========== РЕДАКТИРОВАНИЕ ==========
-        function openEditProductModal(index) {
-            currentEditIndex = index;
-            const card = originalCardsData[index];
-            if (card) {
-                document.getElementById('editTotal').value = card.total;
-                document.getElementById('editStock').value = card.stock;
-                document.getElementById('editProductModal').style.display = 'block';
-            }
-        }
-        
-        function closeEditProductModal() {
-            document.getElementById('editProductModal').style.display = 'none';
-            currentEditIndex = null;
-        }
-        
-        async function saveProductChanges() {
-            if (currentEditIndex === null) return;
-            const card = originalCardsData[currentEditIndex];
-            const newTotal = parseInt(document.getElementById('editTotal').value);
-            const newStock = parseInt(document.getElementById('editStock').value);
-            if (isNaN(newTotal) || isNaN(newStock) || newTotal < 0 || newStock < 0 || newStock > newTotal) {
-                showToast("Некорректные значения", false);
+        // ========== ДОПОЛНИТЕЛЬНАЯ ВЫРУЧКА ==========
+        async function loadExtraRevenues() {
+            if (!isOnline) {
+                const saved = localStorage.getItem('merch_extra_revenues');
+                if (saved) extraRevenues = JSON.parse(saved);
+                else extraRevenues = [];
                 return;
             }
-            card.total = newTotal;
-            card.stock = newStock;
-            filterAndSort();
+            try {
+                const response = await fetch(buildApiUrl("getExtraRevenue"));
+                const data = await response.json();
+                if (data && data.revenues) {
+                    extraRevenues = data.revenues;
+                    localStorage.setItem('merch_extra_revenues', JSON.stringify(extraRevenues));
+                }
+            } catch(e) {
+                const saved = localStorage.getItem('merch_extra_revenues');
+                if (saved) extraRevenues = JSON.parse(saved);
+                else extraRevenues = [];
+            }
+        }
+        
+        async function addExtraRevenue(name, amount) {
+            if (!isOnline) {
+                const newId = Date.now();
+                extraRevenues.push({ id: newId, name: name, amount: amount, date: new Date().toISOString() });
+                localStorage.setItem('merch_extra_revenues', JSON.stringify(extraRevenues));
+                addPendingOperation("addExtraRevenue", `&name=${encodeURIComponent(name)}&amount=${amount}`);
+                showToast("Дополнительная выручка добавлена (будет синхронизирована позже)", true);
+                if (document.getElementById('statsModal')?.style.display === 'block') renderStats();
+                return;
+            }
+            try {
+                const response = await fetch(buildApiUrl("addExtraRevenue", `&name=${encodeURIComponent(name)}&amount=${amount}`));
+                const result = await response.json();
+                if (result.success) {
+                    await loadExtraRevenues();
+                    showToast("Дополнительная выручка добавлена", true);
+                    if (document.getElementById('statsModal')?.style.display === 'block') renderStats();
+                }
+            } catch(e) {
+                extraRevenues.push({ id: Date.now(), name: name, amount: amount, date: new Date().toISOString() });
+                localStorage.setItem('merch_extra_revenues', JSON.stringify(extraRevenues));
+                addPendingOperation("addExtraRevenue", `&name=${encodeURIComponent(name)}&amount=${amount}`);
+                showToast("Дополнительная выручка добавлена (будет синхронизирована позже)", true);
+            }
+        }
+        
+        async function deleteExtraRevenue(index) {
+            const revenueId = extraRevenues[index].id;
+            if (!isOnline) {
+                extraRevenues.splice(index, 1);
+                localStorage.setItem('merch_extra_revenues', JSON.stringify(extraRevenues));
+                addPendingOperation("deleteExtraRevenue", `&id=${revenueId}`);
+                showToast("Запись удалена (будет синхронизирована позже)", true);
+                if (document.getElementById('statsModal')?.style.display === 'block') renderStats();
+                return;
+            }
+            try {
+                const response = await fetch(buildApiUrl("deleteExtraRevenue", `&id=${revenueId}`));
+                const result = await response.json();
+                if (result.success) {
+                    await loadExtraRevenues();
+                    showToast("Запись удалена", true);
+                    if (document.getElementById('statsModal')?.style.display === 'block') renderStats();
+                }
+            } catch(e) {
+                extraRevenues.splice(index, 1);
+                localStorage.setItem('merch_extra_revenues', JSON.stringify(extraRevenues));
+                addPendingOperation("deleteExtraRevenue", `&id=${revenueId}`);
+                showToast("Запись удалена (будет синхронизирована позже)", true);
+            }
+        }
+        // ========== БРОНИРОВАНИЯ ==========
+        async function loadBookings() {
+            if (!isOnline) {
+                const saved = localStorage.getItem('merch_bookings');
+                if (saved) bookingsList = JSON.parse(saved);
+                else bookingsList = [];
+                renderBookingNicksList();
+                return;
+            }
+            try {
+                const response = await fetch(buildApiUrl("getBookings"));
+                const data = await response.json();
+                if (data && data.bookings) {
+                    bookingsList = data.bookings;
+                    localStorage.setItem('merch_bookings', JSON.stringify(bookingsList));
+                    renderBookingNicksList();
+                }
+            } catch(e) {
+                const saved = localStorage.getItem('merch_bookings');
+                if (saved) bookingsList = JSON.parse(saved);
+                else bookingsList = [];
+                renderBookingNicksList();
+            }
+        }
+        
+        async function addBooking() {
+            const nickInput = document.getElementById('bookingNick');
+            const nick = nickInput.value.trim();
+            if (!nick) {
+                showToast("Введите ник покупателя", false);
+                return;
+            }
+            if (bookingSelectedProducts.size === 0) {
+                showToast("Выберите хотя бы один товар", false);
+                return;
+            }
+            
+            const items = [];
+            for (const [productId, item] of bookingSelectedProducts.entries()) {
+                if (item.quantity > 0) {
+                    const card = originalCardsData.find(c => c.id == productId);
+                    if (card && item.quantity > card.stock) {
+                        showToast(`Не хватает "${item.displayName}" (нужно ${item.quantity}, есть ${card.stock})`, false);
+                        return;
+                    }
+                    items.push({
+                        id: productId,
+                        displayName: item.displayName,
+                        type: item.type,
+                        quantity: item.quantity
+                    });
+                }
+            }
             
             if (!isOnline) {
-                addPendingOperation("updateTotal", `&row=${currentEditIndex}&newTotal=${newTotal}&newStock=${newStock}`);
-                showToast(`Товар "${card.name}" обновлён (будет синхронизировано при восстановлении соединения)`, true);
-                closeEditProductModal();
+                const newId = Date.now();
+                const now = new Date().toISOString();
+                for (const item of items) {
+                    bookingsList.push({
+                        id: newId,
+                        nick: nick,
+                        productId: item.id,
+                        productName: item.displayName,
+                        productType: item.type,
+                        quantity: item.quantity,
+                        date: now,
+                        status: "active"
+                    });
+                }
+                localStorage.setItem('merch_bookings', JSON.stringify(bookingsList));
+                addPendingOperation("addBooking", `&nick=${encodeURIComponent(nick)}&items=${encodeURIComponent(JSON.stringify(items))}`);
+                showToast("Бронирование добавлено (будет синхронизировано позже)", true);
+                bookingSelectedProducts.clear();
+                nickInput.value = '';
+                renderBookingProductsSelect();
+                renderBookingSelectedItems();
+                renderBookingNicksList();
                 return;
             }
             
             try {
-                await fetch(buildApiUrl("updateTotal", `&row=${currentEditIndex}&newTotal=${newTotal}&newStock=${newStock}`));
-                showToast(`Товар "${card.name}" обновлён`, true);
-            } catch (e) {
-                console.error(e);
-                addPendingOperation("updateTotal", `&row=${currentEditIndex}&newTotal=${newTotal}&newStock=${newStock}`);
-                showToast(`Товар "${card.name}" обновлён (будет синхронизировано при восстановлении соединения)`, true);
-            }
-            closeEditProductModal();
-        }
-        // ========== СКИДКИ ==========
-        function toggleDiscountPanel() {
-            discountPanelOpen = !discountPanelOpen;
-            const content = document.getElementById('discount-content');
-            const chevron = document.getElementById('discount-chevron');
-            if (content) content.style.display = discountPanelOpen ? 'block' : 'none';
-            if (chevron) chevron.textContent = discountPanelOpen ? '▲' : '▼';
-        }
-        
-        function closeDiscountPanel() {
-            discountPanelOpen = false;
-            const content = document.getElementById('discount-content');
-            const chevron = document.getElementById('discount-chevron');
-            if (content) content.style.display = 'none';
-            if (chevron) chevron.textContent = '▼';
-        }
-        
-        function toggleItemDiscountSelect() {
-            const dropdown = document.getElementById('itemDiscountSelectDropdown');
-            if (dropdown) dropdown.classList.toggle('show');
-        }
-        
-        function selectItemDiscountType(type, label) {
-            const trigger = document.getElementById('itemDiscountSelectTrigger');
-            const hiddenSelect = document.getElementById('itemDiscountTypeSelect');
-            if (trigger) trigger.textContent = label;
-            if (hiddenSelect) hiddenSelect.setAttribute('data-value', type);
-            const dropdown = document.getElementById('itemDiscountSelectDropdown');
-            if (dropdown) dropdown.classList.remove('show');
-        }
-        
-        function renderProductDiscountList() {
-            const container = document.getElementById('productDiscountList');
-            if (!container) return;
-            const cartProductNames = new Set();
-            for (const [idxStr, qty] of Object.entries(cart)) {
-                if (qty > 0) {
-                    const idx = parseInt(idxStr);
-                    const card = originalCardsData[idx];
-                    if (card) cartProductNames.add(card.name);
+                const response = await fetch(buildApiUrl("addBooking", `&nick=${encodeURIComponent(nick)}&items=${encodeURIComponent(JSON.stringify(items))}`));
+                const result = await response.json();
+                if (result.success) {
+                    await loadBookings();
+                    showToast("Бронирование добавлено", true);
+                    bookingSelectedProducts.clear();
+                    nickInput.value = '';
+                    renderBookingProductsSelect();
+                    renderBookingSelectedItems();
+                    renderBookingNicksList();
+                } else {
+                    showToast("Ошибка добавления бронирования", false);
                 }
+            } catch(e) {
+                const newId = Date.now();
+                const now = new Date().toISOString();
+                for (const item of items) {
+                    bookingsList.push({
+                        id: newId,
+                        nick: nick,
+                        productId: item.id,
+                        productName: item.displayName,
+                        productType: item.type,
+                        quantity: item.quantity,
+                        date: now,
+                        status: "active"
+                    });
+                }
+                localStorage.setItem('merch_bookings', JSON.stringify(bookingsList));
+                addPendingOperation("addBooking", `&nick=${encodeURIComponent(nick)}&items=${encodeURIComponent(JSON.stringify(items))}`);
+                showToast("Бронирование добавлено (будет синхронизировано позже)", true);
+                bookingSelectedProducts.clear();
+                nickInput.value = '';
+                renderBookingProductsSelect();
+                renderBookingSelectedItems();
+                renderBookingNicksList();
             }
-            let html = '<div class="product-select-list">';
+        }
+        
+        async function cancelBooking(bookingId) {
+            if (!isOnline) {
+                const index = bookingsList.findIndex(b => b.id == bookingId);
+                if (index !== -1) bookingsList.splice(index, 1);
+                localStorage.setItem('merch_bookings', JSON.stringify(bookingsList));
+                addPendingOperation("cancelBooking", `&id=${bookingId}`);
+                showToast("Бронирование отменено (будет синхронизировано позже)", true);
+                renderBookingNicksList();
+                if (currentBookingNick) showBookingsForNick(currentBookingNick);
+                return;
+            }
+            try {
+                const response = await fetch(buildApiUrl("cancelBooking", `&id=${bookingId}`));
+                const result = await response.json();
+                if (result.success) {
+                    await loadBookings();
+                    showToast("Бронирование отменено", true);
+                    if (currentBookingNick) showBookingsForNick(currentBookingNick);
+                } else {
+                    showToast("Ошибка отмены", false);
+                }
+            } catch(e) {
+                const index = bookingsList.findIndex(b => b.id == bookingId);
+                if (index !== -1) bookingsList.splice(index, 1);
+                localStorage.setItem('merch_bookings', JSON.stringify(bookingsList));
+                addPendingOperation("cancelBooking", `&id=${bookingId}`);
+                showToast("Бронирование отменено (будет синхронизировано позже)", true);
+                renderBookingNicksList();
+                if (currentBookingNick) showBookingsForNick(currentBookingNick);
+            }
+        }
+        
+        async function sellFromBooking(bookingId, productId, quantity, productName, productType) {
+            const card = originalCardsData.find(c => c.id == productId);
+            if (!card) {
+                showToast("Товар не найден", false);
+                return;
+            }
+            if (quantity > card.stock) {
+                showToast(`Не хватает "${productName}" (нужно ${quantity}, есть ${card.stock})`, false);
+                return;
+            }
+            
+            // Добавляем в корзину
+            if (!cart[card.id]) cart[card.id] = 0;
+            cart[card.id] += quantity;
+            updateCartUI();
+            
+            // Отменяем бронь
+            await cancelBooking(bookingId);
+            showToast(`${productName} добавлен в корзину (${quantity} шт)`, true);
+        }
+        
+        function openBookingModal() {
+            const modal = document.getElementById('bookingModal');
+            if (modal) {
+                renderBookingProductsSelect();
+                renderBookingSelectedItems();
+                renderBookingNicksList();
+                modal.style.display = 'block';
+            }
+        }
+        
+        function closeBookingModal() {
+            const modal = document.getElementById('bookingModal');
+            if (modal) modal.style.display = 'none';
+            bookingSelectedProducts.clear();
+            currentBookingNick = null;
+            document.getElementById('bookingNick').value = '';
+        }
+        
+        function renderBookingProductsSelect() {
+            const trigger = document.getElementById('bookingProductsTrigger');
+            const dropdown = document.getElementById('bookingProductsDropdown');
+            if (!trigger || !dropdown) return;
+            
+            let html = '<div class="filter-option-header">Выберите товары</div>';
             originalCardsData.forEach(card => {
-                if (cartProductNames.has(card.name)) {
-                    const isSelected = selectedDiscountProducts.has(card.name);
-                    html += `<div class="product-select-item ${isSelected ? 'selected' : ''}" onclick="toggleProductSelectionForDiscount('${escapeHtml(card.name)}')">
-                                <span class="multi-select-item-label">${escapeHtml(card.name)}</span>${isSelected ? '<span class="product-select-check">✓</span>' : ''}
-                            </div>`;
-                }
+                const displayName = `[${card.type}] ${card.name}`;
+                const isSelected = bookingSelectedProducts.has(card.id);
+                html += `<div class="type-select-item ${isSelected ? 'selected' : ''}" data-id="${card.id}" data-name="${escapeHtml(displayName)}" data-type="${escapeHtml(card.type)}" data-price="${card.price}">
+                            <span>${escapeHtml(displayName)} (${card.price} ₽, остаток: ${card.stock})</span>
+                            ${isSelected ? '<span class="type-select-check">✓</span>' : ''}
+                        </div>`;
             });
+            dropdown.innerHTML = html;
+            
+            document.querySelectorAll('#bookingProductsDropdown .type-select-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(item.dataset.id);
+                    const name = item.dataset.name;
+                    const type = item.dataset.type;
+                    const price = parseInt(item.dataset.price);
+                    
+                    if (bookingSelectedProducts.has(id)) {
+                        bookingSelectedProducts.delete(id);
+                    } else {
+                        bookingSelectedProducts.set(id, {
+                            id: id,
+                            displayName: name,
+                            type: type,
+                            quantity: 1,
+                            price: price
+                        });
+                    }
+                    renderBookingProductsSelect();
+                    renderBookingSelectedItems();
+                });
+            });
+            
+            const selectedCount = bookingSelectedProducts.size;
+            trigger.textContent = selectedCount === 0 ? 'Выберите товары' : `Выбрано: ${selectedCount}`;
+        }
+        
+        function renderBookingSelectedItems() {
+            const container = document.getElementById('bookingSelectedItems');
+            if (!container) return;
+            
+            if (bookingSelectedProducts.size === 0) {
+                container.innerHTML = '<div class="empty-cart" style="padding: 20px;">Нет выбранных товаров</div>';
+                return;
+            }
+            
+            let html = '<div style="margin-top: 8px;"><div style="font-weight: bold; margin-bottom: 8px;">Выбранные товары:</div>';
+            for (const [id, item] of bookingSelectedProducts.entries()) {
+                html += `<div class="cart-item" style="padding: 8px 0;">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${escapeHtml(item.displayName)}</div>
+                                <div class="cart-item-price">${item.price} ₽ × ${item.quantity}</div>
+                            </div>
+                            <div class="cart-item-quantity">
+                                <button class="cart-qty-btn" onclick="changeBookingQty(${id}, -1)">−</button>
+                                <span class="cart-item-qty">${item.quantity}</span>
+                                <button class="cart-qty-btn" onclick="changeBookingQty(${id}, 1)">+</button>
+                                <button class="cart-item-remove" onclick="removeFromBooking(${id})">🗑</button>
+                            </div>
+                        </div>`;
+            }
             html += '</div>';
             container.innerHTML = html;
         }
         
-        function toggleProductSelectionForDiscount(productName) {
-            if (selectedDiscountProducts.has(productName)) selectedDiscountProducts.delete(productName);
-            else selectedDiscountProducts.add(productName);
-            renderProductDiscountList();
-        }
-        
-        function toggleDiscountProductsList() {
-            discountProductListVisible = !discountProductListVisible;
-            const container = document.getElementById('productDiscountList');
-            if (container) container.style.display = discountProductListVisible ? 'block' : 'none';
-            if (discountProductListVisible) renderProductDiscountList();
-        }
-        
-        function selectAllProductsForDiscount() {
-            selectedDiscountProducts.clear();
-            for (const [idxStr, qty] of Object.entries(cart)) {
-                if (qty > 0) {
-                    const idx = parseInt(idxStr);
-                    const card = originalCardsData[idx];
-                    if (card) selectedDiscountProducts.add(card.name);
+        function changeBookingQty(productId, delta) {
+            const item = bookingSelectedProducts.get(productId);
+            if (item) {
+                const newQty = item.quantity + delta;
+                if (newQty < 1) {
+                    bookingSelectedProducts.delete(productId);
+                } else {
+                    item.quantity = newQty;
+                    bookingSelectedProducts.set(productId, item);
                 }
-            }
-            renderProductDiscountList();
-            showToast(`Выбрано ${selectedDiscountProducts.size} товаров`, true);
-        }
-        
-        function selectNoneProductsForDiscount() {
-            selectedDiscountProducts.clear();
-            renderProductDiscountList();
-            showToast(`Выбор товаров сброшен`, true);
-        }
-        
-        function changeItemDiscountValue(delta) {
-            const input = document.getElementById('itemDiscountValue');
-            if (input) {
-                let val = parseFloat(input.value) || 0;
-                const typeSelect = document.getElementById('itemDiscountTypeSelect');
-                const type = typeSelect ? typeSelect.getAttribute('data-value') || 'percent' : 'percent';
-                let step = (type === 'percent') ? 1 : 100;
-                val = Math.max(0, val + delta * step);
-                input.value = val;
+                renderBookingProductsSelect();
+                renderBookingSelectedItems();
             }
         }
         
-        function updateItemDiscountFromInput() {
-            const input = document.getElementById('itemDiscountValue');
-            if (input) {
-                let val = parseFloat(input.value) || 0;
-                if (val < 0) val = 0;
-                input.value = val;
-            }
+        function removeFromBooking(productId) {
+            bookingSelectedProducts.delete(productId);
+            renderBookingProductsSelect();
+            renderBookingSelectedItems();
         }
         
-        function applyItemDiscount() {
-            const typeSelect = document.getElementById('itemDiscountTypeSelect');
-            const type = typeSelect ? typeSelect.getAttribute('data-value') || 'percent' : 'percent';
-            const value = parseFloat(document.getElementById('itemDiscountValue').value) || 0;
-            if (selectedDiscountProducts.size === 0) {
-                showToast("Выберите товары для скидки", false);
+        function renderBookingNicksList() {
+            const container = document.getElementById('bookingNicksList');
+            if (!container) return;
+            
+            const uniqueNicks = [...new Set(bookingsList.map(b => b.nick))];
+            if (uniqueNicks.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 12px;">Нет активных бронирований</div>';
                 return;
             }
-            if (value <= 0) {
-                showToast("Введите корректную сумму скидки", false);
-                return;
+            
+            let html = '';
+            for (const nick of uniqueNicks) {
+                const isActive = currentBookingNick === nick;
+                html += `<div class="nick-chip ${isActive ? 'active' : ''}" onclick="showBookingsForNick('${escapeHtml(nick)}')">${escapeHtml(nick)}</div>`;
             }
-            for (const productName of selectedDiscountProducts) {
-                const card = originalCardsData.find(c => c.name === productName);
-                if (card) {
-                    const idx = originalCardsData.findIndex(c => c.name === productName);
-                    if (!itemDiscounts[idx]) itemDiscounts[idx] = {};
-                    itemDiscounts[idx] = { type: type, value: value };
-                }
-            }
-            selectedDiscountProducts.clear();
-            discountProductListVisible = false;
-            const container = document.getElementById('productDiscountList');
-            if (container) container.style.display = 'none';
-            updateCartUI();
-            showToast("Скидка применена к выбранным товарам", true);
+            container.innerHTML = html;
         }
         
-        function resetItemDiscounts() {
-            itemDiscounts = {};
-            updateCartUI();
-            showToast("Скидки на товары сброшены", true);
+        function showBookingsForNick(nick) {
+            currentBookingNick = nick;
+            renderBookingNicksList();
+            
+            const userBookings = bookingsList.filter(b => b.nick === nick && b.status !== 'cancelled' && b.status !== 'sold');
+            const container = document.getElementById('bookingItemsList');
+            if (!container) return;
+            
+            if (userBookings.length === 0) {
+                container.innerHTML = '<div class="empty-cart" style="padding: 20px;">Нет активных бронирований у этого пользователя</div>';
+                return;
+            }
+            
+            let html = '<div style="font-weight: bold; margin-bottom: 12px;">📦 Забронированные товары:</div>';
+            for (const booking of userBookings) {
+                html += `<div class="booking-item">
+                            <div class="booking-item-info">
+                                <div class="booking-item-name">${escapeHtml(booking.productName)}</div>
+                                <div class="booking-item-details">Количество: ${booking.quantity} шт</div>
+                            </div>
+                            <div>
+                                <button class="booking-sell-btn" onclick="sellFromBooking(${booking.id}, ${booking.productId}, ${booking.quantity}, '${escapeHtml(booking.productName)}', '${escapeHtml(booking.productType)}')">Продать</button>
+                                <button class="booking-cancel-btn" onclick="cancelBooking(${booking.id})">Отменить</button>
+                            </div>
+                        </div>`;
+            }
+            container.innerHTML = html;
         }
         
         // ========== ДОПОЛНИТЕЛЬНЫЕ РАСХОДЫ (ЛОКАЛЬНЫЕ) ==========
@@ -3550,7 +3974,7 @@
                 const scrollContainer = container.querySelector('.multi-select-container');
                 if (scrollContainer) scrollPosition = scrollContainer.scrollTop;
             }
-            const products = originalCardsData.map(c => ({ name: c.name }));
+            const products = originalCardsData.map(c => ({ name: `[${c.type}] ${c.name}` }));
             let html = '<div class="multi-select-container">';
             products.forEach(p => {
                 const isSelected = selectedProducts.has(p.name);
@@ -3705,7 +4129,7 @@
             for (let i = currentYear - 2; i <= currentYear + 2; i++) years.push(i);
             const monthNames = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
             
-            ['dateFromDay', 'dateToDay'].forEach(id => {
+            ['dateFromDay', 'dateToDay', 'statsDateFromDay', 'statsDateToDay'].forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
                     select.innerHTML = '';
@@ -3718,7 +4142,7 @@
                 }
             });
             
-            ['dateFromMonth', 'dateToMonth'].forEach(id => {
+            ['dateFromMonth', 'dateToMonth', 'statsDateFromMonth', 'statsDateToMonth'].forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
                     select.innerHTML = '';
@@ -3731,7 +4155,7 @@
                 }
             });
             
-            ['dateFromYear', 'dateToYear'].forEach(id => {
+            ['dateFromYear', 'dateToYear', 'statsDateFromYear', 'statsDateToYear'].forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
                     select.innerHTML = '';
@@ -3744,7 +4168,7 @@
                 }
             });
             
-            ['timeFromHour', 'timeToHour'].forEach(id => {
+            ['timeFromHour', 'timeToHour', 'statsTimeFromHour', 'statsTimeToHour'].forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
                     select.innerHTML = '';
@@ -3757,7 +4181,7 @@
                 }
             });
             
-            ['timeFromMinute', 'timeToMinute'].forEach(id => {
+            ['timeFromMinute', 'timeToMinute', 'statsTimeFromMinute', 'statsTimeToMinute'].forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
                     select.innerHTML = '';
@@ -3771,12 +4195,27 @@
             });
         }
         
-        function getDateTimeFromSelects(prefix) {
-            const day = document.getElementById(`${prefix}Day`)?.value;
-            const month = document.getElementById(`${prefix}Month`)?.value;
-            const year = document.getElementById(`${prefix}Year`)?.value;
-            const hour = document.getElementById(`time${prefix === 'dateFrom' ? 'From' : 'To'}Hour`)?.value;
-            const minute = document.getElementById(`time${prefix === 'dateFrom' ? 'From' : 'To'}Minute`)?.value;
+        function getDateTimeFromSelects(prefix, isStats = false) {
+            const dayPrefix = isStats ? 'statsDateFrom' : 'dateFrom';
+            const monthPrefix = isStats ? 'statsDateFrom' : 'dateFrom';
+            const yearPrefix = isStats ? 'statsDateFrom' : 'dateFrom';
+            const hourPrefix = isStats ? 'statsTimeFrom' : 'timeFrom';
+            const minutePrefix = isStats ? 'statsTimeFrom' : 'timeFrom';
+            
+            let day, month, year, hour, minute;
+            if (prefix === 'from') {
+                day = document.getElementById(`${isStats ? 'statsDateFrom' : 'dateFrom'}Day`)?.value;
+                month = document.getElementById(`${isStats ? 'statsDateFrom' : 'dateFrom'}Month`)?.value;
+                year = document.getElementById(`${isStats ? 'statsDateFrom' : 'dateFrom'}Year`)?.value;
+                hour = document.getElementById(`${isStats ? 'statsTimeFrom' : 'timeFrom'}Hour`)?.value;
+                minute = document.getElementById(`${isStats ? 'statsTimeFrom' : 'timeFrom'}Minute`)?.value;
+            } else {
+                day = document.getElementById(`${isStats ? 'statsDateTo' : 'dateTo'}Day`)?.value;
+                month = document.getElementById(`${isStats ? 'statsDateTo' : 'dateTo'}Month`)?.value;
+                year = document.getElementById(`${isStats ? 'statsDateTo' : 'dateTo'}Year`)?.value;
+                hour = document.getElementById(`${isStats ? 'statsTimeTo' : 'timeTo'}Hour`)?.value;
+                minute = document.getElementById(`${isStats ? 'statsTimeTo' : 'timeTo'}Minute`)?.value;
+            }
             if (day && month && year && hour && minute) {
                 return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
             }
@@ -3829,8 +4268,8 @@
             const container = document.getElementById('history-list');
             if (!container) return;
             
-            const fromDate = getDateTimeFromSelects('dateFrom');
-            const toDate = getDateTimeFromSelects('dateTo');
+            const fromDate = getDateTimeFromSelects('from');
+            const toDate = getDateTimeFromSelects('to');
             const minPrice = parseInt(document.getElementById('historyMinPrice')?.value) || 0;
             const maxPrice = parseInt(document.getElementById('historyMaxPrice')?.value) || Infinity;
             
@@ -4117,7 +4556,7 @@
                 return;
             }
             currentFilteredData.forEach((card, displayIndex) => {
-                const originalIndex = originalCardsData.findIndex(orig => orig.name === card.name && orig.type === card.type);
+                const originalIndex = originalCardsData.findIndex(orig => orig.id === card.id);
                 const type = card.type || "";
                 const name = card.name || "Без названия";
                 const total = typeof card.total === 'number' ? card.total : 0;
@@ -4145,13 +4584,13 @@
                             <span class="name">${escapeHtml(name)}</span>
                         </div>
                         <div class="stock-row"><span class="stock">Остаток: ${stock} шт</span></div>
-                        <div class="total-row"><span class="total">📦 Всего: ${total} шт</span><button class="edit-icon" onclick="openEditProductModal(${originalIndex})">✏️</button></div>
+                        <div class="total-row"><span class="total">📦 Всего: ${total} шт</span><button class="edit-icon" onclick="openEditProductModalById(${card.id})">✏️</button></div>
                         <div class="price-row"><span class="price">💰 Цена: ${price} ₽</span></div>
                     </div>
                     <div class="buttons">
-                        <button class="minus" data-index="${originalIndex}" data-delta="-1">−1</button>
-                        <button class="plus" data-index="${originalIndex}" data-delta="+1">+1</button>
-                        <button class="add-to-cart" data-index="${originalIndex}">➕</button>
+                        <button class="minus" data-id="${card.id}" data-delta="-1">−1</button>
+                        <button class="plus" data-id="${card.id}" data-delta="+1">+1</button>
+                        <button class="add-to-cart" data-id="${card.id}">➕</button>
                     </div>
                 `;
                 container.appendChild(cardDiv);
@@ -4167,17 +4606,30 @@
             updateCardBadges();
         }
         
+        function openEditProductModalById(productId) {
+            const card = originalCardsData.find(c => c.id === productId);
+            if (card) {
+                currentEditProductId = productId;
+                document.getElementById('editId').value = card.id;
+                document.getElementById('editName').value = card.name;
+                document.getElementById('editType').value = card.type;
+                document.getElementById('editTotal').value = card.total;
+                document.getElementById('editStock').value = card.stock;
+                document.getElementById('editProductModal').style.display = 'block';
+            }
+        }
+        
         function handleAddToCart(e) {
             const btn = e.currentTarget;
-            const index = parseInt(btn.dataset.index);
-            addToCart(index);
+            const productId = parseInt(btn.dataset.id);
+            addToCart(productId);
         }
         
         async function handleButtonClick(e) {
             const btn = e.currentTarget;
-            const index = parseInt(btn.dataset.index);
+            const productId = parseInt(btn.dataset.id);
             const delta = parseInt(btn.dataset.delta);
-            await updateStock(index, delta);
+            await updateStock(productId, delta);
         }
         
         function initSortSelect() {
@@ -4316,28 +4768,86 @@
             document.querySelectorAll('.card').forEach(card => {
                 const minusBtn = card.querySelector('.minus');
                 if (minusBtn) {
-                    const idx = parseInt(minusBtn.dataset.index);
+                    const id = parseInt(minusBtn.dataset.id);
                     let badge = card.querySelector('.cart-qty-badge');
-                    if (cart.hasOwnProperty(idx) && cart[idx] > 0) {
+                    if (cart.hasOwnProperty(id) && cart[id] > 0) {
                         if (!badge) { badge = document.createElement('div'); badge.className = 'cart-qty-badge'; card.style.position = 'relative'; card.appendChild(badge); }
-                        badge.textContent = cart[idx];
+                        badge.textContent = cart[id];
                         badge.style.background = 'var(--btn-bg)';
                     } else { if (badge) badge.remove(); }
                 }
             });
         }
         
-        function getBestDiscountForItem(idx, originalPrice, qty, subtotal) {
+        function getBestDiscountForItem(id, originalPrice, qty, subtotal) {
             let finalPrice = originalPrice;
             let discountValue = 0;
             let discountType = null;
-            if (itemDiscounts[idx]) {
-                const disc = itemDiscounts[idx];
+            if (itemDiscounts[id]) {
+                const disc = itemDiscounts[id];
                 discountType = disc.type;
                 if (disc.type === 'percent') { finalPrice = originalPrice * (1 - disc.value / 100); discountValue = disc.value; }
                 else if (disc.type === 'fixed') { finalPrice = Math.max(0, originalPrice - disc.value); discountValue = disc.value; }
             }
             return { price: finalPrice, discountValue: discountValue, discountType: discountType };
+        }
+        
+        function applyDiscountToCart(totalDiscountPercent, totalDiscountFixed) {
+            const items = Object.entries(cart);
+            if (items.length === 0) return;
+            let subtotal = 0;
+            const itemDetails = [];
+            for (const [idStr, qty] of items) {
+                const id = parseInt(idStr);
+                const card = originalCardsData.find(c => c.id === id);
+                if (card) {
+                    const itemTotal = qty * card.price;
+                    subtotal += itemTotal;
+                    itemDetails.push({ id, qty, price: card.price, itemTotal });
+                }
+            }
+            
+            let discountAmount = 0;
+            if (totalDiscountPercent > 0) discountAmount = subtotal * totalDiscountPercent / 100;
+            else if (totalDiscountFixed > 0) discountAmount = Math.min(totalDiscountFixed, subtotal);
+            
+            if (discountAmount <= 0) return;
+            
+            // Пропорциональное распределение с перераспределением остатка
+            let remainingDiscount = discountAmount;
+            const discounts = {};
+            const itemsWithDiscount = itemDetails.map(item => {
+                const discountShare = (item.itemTotal / subtotal) * discountAmount;
+                discounts[item.id] = Math.min(discountShare, item.itemTotal);
+                remainingDiscount -= discounts[item.id];
+                return { ...item, discount: discounts[item.id] };
+            });
+            
+            // Перераспределяем остаток
+            let i = 0;
+            while (remainingDiscount > 0.01 && i < itemsWithDiscount.length) {
+                for (const item of itemsWithDiscount) {
+                    if (remainingDiscount <= 0.01) break;
+                    const maxPossible = item.itemTotal - discounts[item.id];
+                    if (maxPossible > 0) {
+                        const add = Math.min(remainingDiscount, maxPossible);
+                        discounts[item.id] += add;
+                        remainingDiscount -= add;
+                    }
+                }
+                i++;
+            }
+            
+            // Применяем скидку к каждому товару
+            for (const [id, discount] of Object.entries(discounts)) {
+                const card = originalCardsData.find(c => c.id == id);
+                if (card && discount > 0) {
+                    const discountPercent = (discount / (cart[id] * card.price)) * 100;
+                    if (!itemDiscounts[id]) itemDiscounts[id] = {};
+                    itemDiscounts[id] = { type: 'percent', value: discountPercent };
+                }
+            }
+            updateCartUI();
         }
         
         function updateCartUI() {
@@ -4379,12 +4889,13 @@
                 html += `</div>`;
             }
             let subtotal = 0;
-            for (const [idxStr, qty] of Object.entries(cart)) { const idx = parseInt(idxStr); const card = originalCardsData[idx]; if (card) subtotal += qty * card.price; }
-            for (const [idxStr, qty] of Object.entries(cart)) {
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
+            for (const [idStr, qty] of Object.entries(cart)) { const id = parseInt(idStr); const card = originalCardsData.find(c => c.id === id); if (card) subtotal += qty * card.price; }
+            for (const [idStr, qty] of Object.entries(cart)) {
+                const id = parseInt(idStr);
+                const card = originalCardsData.find(c => c.id === id);
                 if (!card) continue;
-                const best = getBestDiscountForItem(idx, card.price, qty, subtotal);
+                const displayName = `[${card.type}] ${card.name}`;
+                const best = getBestDiscountForItem(id, card.price, qty, subtotal);
                 const originalItemTotal = card.price * qty;
                 const discountedItemTotal = best.price * qty;
                 total += discountedItemTotal;
@@ -4395,9 +4906,9 @@
                     if (best.discountType === 'percent') discountText = `<div style="font-size: 11px; color: var(--profit-positive);">Скидка: ${best.discountValue}%</div>`;
                     else if (best.discountType === 'fixed') discountText = `<div style="font-size: 11px; color: var(--profit-positive);">Скидка: ${best.discountValue * qty} ₽</div>`;
                 }
-                html += `<div class="cart-item ${isZero ? 'disabled' : ''}"><div class="cart-item-info"><div class="cart-item-name">${escapeHtml(card.name)}</div>
+                html += `<div class="cart-item ${isZero ? 'disabled' : ''}"><div class="cart-item-info"><div class="cart-item-name">${escapeHtml(displayName)}</div>
                         <div class="cart-item-price">${card.price} ₽ × ${qty} = ${hasDiscount ? `<span class="strikethrough">${originalItemTotal.toFixed(2)} ₽</span> ${discountedItemTotal.toFixed(2)} ₽` : `${originalItemTotal.toFixed(2)} ₽`}</div>${discountText}</div>
-                        <div class="cart-item-quantity"><button class="cart-qty-btn" onclick="changeCartQty(${idx}, -1)" ${isZero ? 'disabled' : ''}>−</button><span class="cart-item-qty">${qty}</span><button class="cart-qty-btn" onclick="changeCartQty(${idx}, 1)">+</button><button class="cart-item-remove" onclick="removeFromCart(${idx})">🗑</button></div></div>`;
+                        <div class="cart-item-quantity"><button class="cart-qty-btn" onclick="changeCartQty(${id}, -1)" ${isZero ? 'disabled' : ''}>−</button><span class="cart-item-qty">${qty}</span><button class="cart-qty-btn" onclick="changeCartQty(${id}, 1)">+</button><button class="cart-item-remove" onclick="removeFromCart(${id})">🗑</button></div></div>`;
             }
             cartItemsDiv.innerHTML = html;
             if (cartTotalDiv) {
@@ -4411,33 +4922,33 @@
             updateCardBadges();
         }
         
-        function addToCart(index) {
-            const card = originalCardsData[index];
+        function addToCart(productId) {
+            const card = originalCardsData.find(c => c.id === productId);
             if (!card) return;
             if (card.stock <= 0) { showToast(`${card.name} закончился!`, false); return; }
-            const currentQty = cart[index] || 0;
+            const currentQty = cart[productId] || 0;
             if (currentQty + 1 > card.stock) { showToast(`Нельзя добавить больше, чем есть (${card.stock} шт)`, false); return; }
-            cart[index] = currentQty + 1;
+            cart[productId] = currentQty + 1;
             updateCartUI();
             showToast(`${card.name} +1`, true);
         }
         
-        function changeCartQty(index, delta) {
-            const card = originalCardsData[index];
+        function changeCartQty(productId, delta) {
+            const card = originalCardsData.find(c => c.id === productId);
             if (!card) return;
-            const currentQty = cart[index] || 0;
+            const currentQty = cart[productId] || 0;
             const newQty = currentQty + delta;
             if (newQty < 0) return;
             if (newQty > card.stock) { showToast(`Нельзя добавить больше, чем есть (${card.stock} шт)`, false); return; }
-            if (newQty === 0) delete cart[index];
-            else cart[index] = newQty;
+            if (newQty === 0) delete cart[productId];
+            else cart[productId] = newQty;
             updateCartUI();
         }
         
-        function removeFromCart(index) {
-            delete cart[index];
+        function removeFromCart(productId) {
+            delete cart[productId];
             updateCartUI();
-            const card = originalCardsData[index];
+            const card = originalCardsData.find(c => c.id === productId);
             if (card) showToast(`${card.name} удалён из корзины`, true);
         }
         
@@ -4452,12 +4963,17 @@
         function giftCart() {
             const items = Object.entries(cart).filter(([_, qty]) => qty > 0);
             if (items.length === 0) { showToast("Нет товаров для подарка", false); return; }
-            for (const [idxStr, qty] of items) {
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
+            for (const [idStr, qty] of items) {
+                const id = parseInt(idStr);
+                const card = originalCardsData.find(c => c.id === id);
+                if (!card) continue;
                 if (qty > card.stock) { showToast(`Не хватает "${card.name}" (нужно ${qty}, есть ${card.stock})`, false); return; }
             }
-            const historyItems = items.map(([idxStr, qty]) => { const idx = parseInt(idxStr); const card = originalCardsData[idx]; return { name: card.name, qty: qty, price: 0 }; });
+            const historyItems = items.map(([idStr, qty]) => {
+                const id = parseInt(idStr);
+                const card = originalCardsData.find(c => c.id === id);
+                return { name: `[${card.type}] ${card.name}`, qty: qty, price: 0 };
+            });
             addToHistory(historyItems, 0, 'gift', false);
             const cartCopy = { ...cart };
             closeCartModal();
@@ -4465,34 +4981,23 @@
             itemDiscounts = {};
             selectedDiscountProducts.clear();
             updateCartUI();
-            for (const [idxStr, qty] of Object.entries(cartCopy)) {
+            for (const [idStr, qty] of Object.entries(cartCopy)) {
                 if (qty === 0) continue;
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
+                const id = parseInt(idStr);
+                const card = originalCardsData.find(c => c.id === id);
+                if (!card) continue;
                 const newStock = card.stock - qty;
                 card.stock = newStock;
-                const cards = document.querySelectorAll('.card');
-                let targetCard = null;
-                for (let i = 0; i < cards.length; i++) {
-                    const minusBtn = cards[i].querySelector('.minus');
-                    if (minusBtn && parseInt(minusBtn.dataset.index) === idx) { targetCard = cards[i]; break; }
-                }
-                if (targetCard) {
-                    const stockSpan = targetCard.querySelector('.stock');
-                    if (stockSpan) stockSpan.textContent = `Остаток: ${newStock} шт`;
-                    if (newStock === 0) targetCard.classList.add('out-of-stock');
-                    else targetCard.classList.remove('out-of-stock');
-                }
             }
             (async () => {
-                for (const [idxStr, qty] of Object.entries(cartCopy)) {
+                for (const [idStr, qty] of Object.entries(cartCopy)) {
                     if (qty === 0) continue;
-                    const idx = parseInt(idxStr);
+                    const id = parseInt(idStr);
                     for (let i = 0; i < qty; i++) {
                         if (!isOnline) {
-                            addPendingOperation("update", `&row=${idx}&delta=-1`);
+                            addPendingOperation("update", `&row=${originalCardsData.findIndex(c => c.id === id)}&delta=-1`);
                         } else {
-                            try { await fetch(buildApiUrl("update", `&row=${idx}&delta=-1`)); } catch(e) { addPendingOperation("update", `&row=${idx}&delta=-1`); }
+                            try { await fetch(buildApiUrl("update", `&row=${originalCardsData.findIndex(c => c.id === id)}&delta=-1`)); } catch(e) { addPendingOperation("update", `&row=${originalCardsData.findIndex(c => c.id === id)}&delta=-1`); }
                         }
                     }
                 }
@@ -4509,37 +5014,39 @@
         
         function closeCartModal() { const modal = document.getElementById('cartModal'); if (modal) modal.style.display = 'none'; }
         
-        async function updateStock(index, delta, silent = false) {
-            const card = originalCardsData[index];
+        async function updateStock(productId, delta, silent = false) {
+            const card = originalCardsData.find(c => c.id === productId);
             if (!card) return;
             const newStock = card.stock + delta;
             if (newStock < 0) { if (!silent) showToast("Остаток не может быть меньше 0", false); return; }
             card.stock = newStock;
             filterAndSort();
             
+            const rowIndex = originalCardsData.findIndex(c => c.id === productId);
+            
             if (!isOnline) {
-                addPendingOperation("update", `&row=${index}&delta=${delta}`);
+                addPendingOperation("update", `&row=${rowIndex}&delta=${delta}`);
                 updateCardBadges();
                 if (!silent) {
-                    if (delta === -1) { addSingleSaleToHistory(card.name, 1, card.price, false); showToast(`Продажа: ${card.name} -1 шт (будет синхронизировано)`, true); }
-                    else if (delta === 1) { addSingleSaleToHistory(card.name, 1, card.price, true); showToast(`Возврат: ${card.name} +1 шт (будет синхронизировано)`, true); }
+                    if (delta === -1) { addSingleSaleToHistory(`[${card.type}] ${card.name}`, 1, card.price, false); showToast(`Продажа: ${card.name} -1 шт (будет синхронизировано)`, true); }
+                    else if (delta === 1) { addSingleSaleToHistory(`[${card.type}] ${card.name}`, 1, card.price, true); showToast(`Возврат: ${card.name} +1 шт (будет синхронизировано)`, true); }
                 }
                 return;
             }
             
             try {
-                const response = await fetch(buildApiUrl("update", `&row=${index}&delta=${delta}`));
+                const response = await fetch(buildApiUrl("update", `&row=${rowIndex}&delta=${delta}`));
                 const result = await response.json();
                 if (!result.success && !silent) { await loadData(true, true); showToast("Ошибка: " + (result.error || "неизвестная"), false); }
             } catch (error) {
                 console.error(error);
-                addPendingOperation("update", `&row=${index}&delta=${delta}`);
+                addPendingOperation("update", `&row=${rowIndex}&delta=${delta}`);
                 if (!silent) showToast(`Операция сохранена для синхронизации`, true);
             }
             updateCardBadges();
             if (!silent) {
-                if (delta === -1) { addSingleSaleToHistory(card.name, 1, card.price, false); showToast(`Продажа: ${card.name} -1 шт`, true); }
-                else if (delta === 1) { addSingleSaleToHistory(card.name, 1, card.price, true); showToast(`Возврат: ${card.name} +1 шт`, true); }
+                if (delta === -1) { addSingleSaleToHistory(`[${card.type}] ${card.name}`, 1, card.price, false); showToast(`Продажа: ${card.name} -1 шт`, true); }
+                else if (delta === 1) { addSingleSaleToHistory(`[${card.type}] ${card.name}`, 1, card.price, true); showToast(`Возврат: ${card.name} +1 шт`, true); }
             }
         }
         
@@ -4547,13 +5054,32 @@
             const items = Object.entries(cart).filter(([_, qty]) => qty > 0);
             if (items.length === 0) { showToast("Нет товаров для продажи", false); return; }
             let subtotal = 0;
-            for (const [idxStr, qty] of items) { const idx = parseInt(idxStr); const card = originalCardsData[idx]; subtotal += qty * card.price; }
+            for (const [idStr, qty] of items) { const id = parseInt(idStr); const card = originalCardsData.find(c => c.id === id); if (card) subtotal += qty * card.price; }
             let total = 0;
-            for (const [idxStr, qty] of items) { const idx = parseInt(idxStr); const card = originalCardsData[idx]; const best = getBestDiscountForItem(idx, card.price, qty, subtotal); total += best.price * qty; }
-            for (const [idxStr, qty] of items) { const idx = parseInt(idxStr); const card = originalCardsData[idx]; if (qty > card.stock) { showToast(`Не хватает "${card.name}" (нужно ${qty}, есть ${card.stock})`, false); return; } }
+            for (const [idStr, qty] of items) { const id = parseInt(idStr); const card = originalCardsData.find(c => c.id === id); if (card) { const best = getBestDiscountForItem(id, card.price, qty, subtotal); total += best.price * qty; } }
+            for (const [idStr, qty] of items) { const id = parseInt(idStr); const card = originalCardsData.find(c => c.id === id); if (card && qty > card.stock) { showToast(`Не хватает "${card.name}" (нужно ${qty}, есть ${card.stock})`, false); return; } }
+            
+            // Проверка на бронирования
+            for (const [idStr, qty] of items) {
+                const id = parseInt(idStr);
+                const card = originalCardsData.find(c => c.id === id);
+                if (card) {
+                    const bookingForProduct = bookingsList.find(b => b.productId === id && b.status === 'active' && b.nick !== CURRENT_USER.name);
+                    if (bookingForProduct) {
+                        if (!confirm(`Товар "${card.name}" забронирован пользователем ${bookingForProduct.nick}. Продолжить продажу?`)) {
+                            return;
+                        }
+                    }
+                }
+            }
+            
             const activeRules = checkRulesForCart();
             if (activeRules.length > 0) { let rulesMessage = "Не забудьте:\n"; for (const rule of activeRules) rulesMessage += `• ${rule.message}\n`; showToast(rulesMessage, true); }
-            const historyItems = items.map(([idxStr, qty]) => { const idx = parseInt(idxStr); const card = originalCardsData[idx]; return { name: card.name, qty: qty, price: card.price }; });
+            const historyItems = items.map(([idStr, qty]) => {
+                const id = parseInt(idStr);
+                const card = originalCardsData.find(c => c.id === id);
+                return { name: `[${card.type}] ${card.name}`, qty: qty, price: card.price };
+            });
             addToHistory(historyItems, total, 'basket', false);
             const cartCopy = { ...cart };
             closeCartModal();
@@ -4561,43 +5087,56 @@
             itemDiscounts = {};
             selectedDiscountProducts.clear();
             updateCartUI();
-            for (const [idxStr, qty] of Object.entries(cartCopy)) {
+            for (const [idStr, qty] of Object.entries(cartCopy)) {
                 if (qty === 0) continue;
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
+                const id = parseInt(idStr);
+                const card = originalCardsData.find(c => c.id === id);
+                if (!card) continue;
                 const newStock = card.stock - qty;
                 card.stock = newStock;
-                const cards = document.querySelectorAll('.card');
-                let targetCard = null;
-                for (let i = 0; i < cards.length; i++) {
-                    const minusBtn = cards[i].querySelector('.minus');
-                    if (minusBtn && parseInt(minusBtn.dataset.index) === idx) { targetCard = cards[i]; break; }
-                }
-                if (targetCard) {
-                    const stockSpan = targetCard.querySelector('.stock');
-                    if (stockSpan) stockSpan.textContent = `Остаток: ${newStock} шт`;
-                    if (newStock === 0) targetCard.classList.add('out-of-stock');
-                    else targetCard.classList.remove('out-of-stock');
-                }
             }
             (async () => {
-                for (const [idxStr, qty] of Object.entries(cartCopy)) {
+                for (const [idStr, qty] of Object.entries(cartCopy)) {
                     if (qty === 0) continue;
-                    const idx = parseInt(idxStr);
+                    const id = parseInt(idStr);
+                    const rowIndex = originalCardsData.findIndex(c => c.id === id);
                     for (let i = 0; i < qty; i++) {
                         if (!isOnline) {
-                            addPendingOperation("update", `&row=${idx}&delta=-1`);
+                            addPendingOperation("update", `&row=${rowIndex}&delta=-1`);
                         } else {
-                            try { await fetch(buildApiUrl("update", `&row=${idx}&delta=-1`)); } catch(e) { addPendingOperation("update", `&row=${idx}&delta=-1`); }
+                            try { await fetch(buildApiUrl("update", `&row=${rowIndex}&delta=-1`)); } catch(e) { addPendingOperation("update", `&row=${rowIndex}&delta=-1`); }
                         }
+                    }
+                    // Снимаем бронирования
+                    const bookingToRemove = bookingsList.filter(b => b.productId === id && b.status === 'active');
+                    for (const booking of bookingToRemove) {
+                        await cancelBooking(booking.id);
                     }
                 }
                 showUpdateTime();
+                loadBookings();
             })();
             showToast(`Продажа на ${Math.max(0, total).toFixed(2)} ₽ завершена!`, true);
         }
         
         // ========== СТАТИСТИКА ==========
+        function toggleStatsFilter() {
+            const panel = document.getElementById('statsFilterPanel');
+            const toggle = document.querySelector('.filter-toggle');
+            if (panel && toggle) {
+                panel.classList.toggle('open');
+                toggle.classList.toggle('open');
+            }
+        }
+        
+        function applyStatsFilter() {
+            const fromDate = getDateTimeFromSelects('from', true);
+            const toDate = getDateTimeFromSelects('to', true);
+            statsFilterFrom = fromDate;
+            statsFilterTo = toDate;
+            renderStats();
+        }
+        
         function openStatsModal() {
             const modal = document.getElementById('statsModal');
             if (modal) { renderStats(); modal.style.display = 'block'; }
@@ -4608,9 +5147,16 @@
         function renderStats() {
             const container = document.getElementById('stats-content');
             if (!container) return;
-            const sales = salesHistory.filter(entry => !entry.isReturn && !entry.hidden);
+            let sales = salesHistory.filter(entry => !entry.isReturn && !entry.hidden);
+            if (statsFilterFrom) sales = sales.filter(e => new Date(e.date) >= statsFilterFrom);
+            if (statsFilterTo) sales = sales.filter(e => new Date(e.date) <= statsFilterTo);
             let totalRevenue = 0, totalItemsSold = 0, orderCount = sales.length;
             for (const sale of sales) { let saleItems = 0; for (const item of sale.items) { totalRevenue += item.qty * item.price; saleItems += item.qty; } totalItemsSold += saleItems; }
+            
+            // Дополнительная выручка
+            const totalExtraRevenue = extraRevenues.reduce((sum, rev) => sum + (rev.amount || 0), 0);
+            totalRevenue += totalExtraRevenue;
+            
             const averageCheck = orderCount > 0 ? totalRevenue / orderCount : 0;
             let totalCostAllGoods = 0;
             for (const card of originalCardsData) totalCostAllGoods += (card.cost || 0) * (card.total || 0);
@@ -4621,13 +5167,15 @@
             const productStats = {}, typeStats = {};
             for (const sale of sales) {
                 for (const item of sale.items) {
-                    const card = originalCardsData.find(c => c.name === item.name);
-                    const type = card?.type || "Другое";
+                    const name = item.name;
+                    const type = name.split('] ')[0].replace('[', '') || "Другое";
+                    const cleanName = name.split('] ')[1] || name;
+                    const card = originalCardsData.find(c => c.name === cleanName);
                     const revenue = item.qty * item.price;
                     const totalCostForItem = (card?.cost || 0) * (card?.total || 0);
-                    if (!productStats[item.name]) productStats[item.name] = { type: type, qty: 0, revenue: 0, totalCost: totalCostForItem };
-                    productStats[item.name].qty += item.qty;
-                    productStats[item.name].revenue += revenue;
+                    if (!productStats[name]) productStats[name] = { type: type, qty: 0, revenue: 0, totalCost: totalCostForItem };
+                    productStats[name].qty += item.qty;
+                    productStats[name].revenue += revenue;
                     if (!typeStats[type]) typeStats[type] = { qty: 0, revenue: 0, totalCost: 0 };
                     typeStats[type].qty += item.qty;
                     typeStats[type].revenue += revenue;
@@ -4651,17 +5199,22 @@
                     <div class="stats-card"><div class="stats-card-value">${formatCurrency(averageCheck)}</div><div class="stats-card-label">💳 Средний чек</div></div></div>
                 <div class="stats-summary-compact"><div class="stats-summary-value ${profitMargin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(profitMargin)}</div><div class="stats-summary-label">Рентабельность продаж</div></div>
                 <div class="detail-section"><div class="detail-title">📦 Детализация по товарам</div><table class="detail-table"><thead><tr><th>Товар</th><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Себест.</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th></tr></thead><tbody>`;
-            for (const p of productDetails) html += `<tr><td>${escapeHtml(p.name)}</td><td><span class="type-badge" style="background:${getTypeColor(p.type)}20; color:${getTypeColor(p.type)};">${escapeHtml(p.type)}</span></td><td class="text-right">${p.qty} шт</td><td class="text-right">${formatCurrency(p.revenue)}</td><td class="text-right">${formatCurrency(p.totalCost)}</td><td class="text-right ${p.profit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(p.profit)}</td><td class="text-right ${p.margin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(p.margin)}</td></tr>`;
-            html += `</tbody></table></div><div class="detail-section"><div class="detail-title">🏷️ Детализация по типам мерча</div><table class="detail-table"><thead><tr><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Себест.</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th></tr></thead><tbody>`;
-            for (const t of typeDetails) html += `<tr><td><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td><td class="text-right">${t.qty} шт</td><td class="text-right">${formatCurrency(t.revenue)}</td><td class="text-right">${formatCurrency(t.totalCost)}</td><td class="text-right ${t.profit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(t.profit)}</td><td class="text-right ${t.margin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(t.margin)}</td></tr>`;
+            for (const p of productDetails) html += `<tr><td class="text-right"></td><td class="text-right">${escapeHtml(p.name)}</td><td><span class="type-badge" style="background:${getTypeColor(p.type)}20; color:${getTypeColor(p.type)};">${escapeHtml(p.type)}</span></td><td class="text-right">${p.qty} шт</td><td class="text-right">${formatCurrency(p.revenue)}</td><td class="text-right">${formatCurrency(p.totalCost)}</td><td class="text-right ${p.profit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(p.profit)}</td><td class="text-right ${p.margin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(p.margin)}</tr>`;
+            html += `</tbody></tr></div><div class="detail-section"><div class="detail-title">🏷️ Детализация по типам мерча</div><table class="detail-table"><thead><tr><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Себест.</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th></tr></thead><tbody>`;
+            for (const t of typeDetails) html += `<tr><td class="text-right"></td><td><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td><td class="text-right">${t.qty} шт</td><td class="text-right">${formatCurrency(t.revenue)}</td><td class="text-right">${formatCurrency(t.totalCost)}</td><td class="text-right ${t.profit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(t.profit)}</td><td class="text-right ${t.margin >= 0 ? 'profit-positive' : 'profit-negative'}">${formatPercent(t.margin)}</tr>`;
             html += `</tbody></table></div><div class="two-columns"><div class="detail-section"><div class="detail-title">🏆 Самые популярные товары</div><table class="detail-table"><thead><tr><th>#</th><th>Товар</th><th>Тип</th><th class="text-right">Продано, шт</th></tr></thead><tbody>`;
-            for (let i = 0; i < topByQty.length; i++) { const [name, data] = topByQty[i]; html += `<tr><td class="text-right"><span class="popular-badge">${i + 1}</span></td><td>${escapeHtml(name)}</td><td><span class="type-badge" style="background:${getTypeColor(data.type)}20; color:${getTypeColor(data.type)};">${escapeHtml(data.type)}</span></td><td class="text-right">${data.qty} шт</td></tr>`; }
-            html += `</tbody></table></div><div class="detail-section"><div class="detail-title">🏆 Самые популярные типы мерча</div><table class="detail-table"><thead><tr><th>#</th><th>Тип</th><th class="text-right">Продано, шт</th></tr></thead><tbody>`;
-            for (let i = 0; i < topTypesByQty.length; i++) { const [type, data] = topTypesByQty[i]; html += `<tr><td class="text-right"><span class="popular-badge">${i + 1}</span></td><td><span class="type-badge" style="background:${getTypeColor(type)}20; color:${getTypeColor(type)};">${escapeHtml(type)}</span></td><td class="text-right">${data.qty} шт</td></tr>`; }
-            html += `</tbody></table></div></div><div class="extra-costs-section"><div class="detail-title">➕ Дополнительные расходы</div><div id="extra-costs-list">`;
+            for (let i = 0; i < topByQty.length; i++) { const [name, data] = topByQty[i]; html += `<tr><td class="text-right"><span class="popular-badge">${i + 1}</span></td><td class="text-right"><td>${escapeHtml(name)}</td><td><span class="type-badge" style="background:${getTypeColor(data.type)}20; color:${getTypeColor(data.type)};">${escapeHtml(data.type)}</span></td><td class="text-right">${data.qty} шт</tr>`; }
+            html += `</tbody></tr></div><div class="detail-section"><div class="detail-title">🏆 Самые популярные типы мерча</div><table class="detail-table"><thead><tr><th>#</th><th>Тип</th><th class="text-right">Продано, шт</th></tr></thead><tbody>`;
+            for (let i = 0; i < topTypesByQty.length; i++) { const [type, data] = topTypesByQty[i]; html += `<tr><td class="text-right"><span class="popular-badge">${i + 1}</span></td><td class="text-right"><span class="type-badge" style="background:${getTypeColor(type)}20; color:${getTypeColor(type)};">${escapeHtml(type)}</span></td><td class="text-right">${data.qty} шт</tr>`; }
+            html += `</tbody></table></div></div>
+                <div class="extra-costs-section"><div class="detail-title">➕ Дополнительные расходы</div><div id="extra-costs-list">`;
             if (extraCosts.length === 0) html += '<div style="color: var(--text-muted); text-align: center; padding: 12px;">Нет дополнительных расходов</div>';
             for (let i = 0; i < extraCosts.length; i++) { const cost = extraCosts[i]; html += `<div class="extra-cost-item"><span class="extra-cost-name">${escapeHtml(cost.name)}</span><span class="extra-cost-amount">${cost.amount} ₽</span><button class="extra-cost-delete" onclick="deleteExtraCost(${i})">🗑</button></div>`; }
-            html += `</div><div class="add-cost-form"><input type="text" id="newCostName" class="add-cost-input" placeholder="Название (стол, доставка...)" autocomplete="off"><input type="number" id="newCostAmount" class="add-cost-input-number" placeholder="Сумма" value="0" step="100"><button class="add-cost-btn" onclick="addExtraCostFromModal()">➕ Добавить</button></div></div>`;
+            html += `</div><div class="add-cost-form"><input type="text" id="newCostName" class="add-cost-input" placeholder="Название (стол, доставка...)" autocomplete="off"><input type="number" id="newCostAmount" class="add-cost-input-number" placeholder="Сумма" value="0" step="100"><button class="add-cost-btn" onclick="addExtraCostFromModal()">➕ Добавить</button></div></div>
+                <div class="extra-costs-section"><div class="detail-title">➕ Дополнительная выручка</div><div id="extra-revenue-list">`;
+            if (extraRevenues.length === 0) html += '<div style="color: var(--text-muted); text-align: center; padding: 12px;">Нет дополнительной выручки</div>';
+            for (let i = 0; i < extraRevenues.length; i++) { const rev = extraRevenues[i]; html += `<div class="extra-cost-item"><span class="extra-cost-name">${escapeHtml(rev.name)}</span><span class="extra-cost-amount">${rev.amount} ₽</span><button class="extra-cost-delete" onclick="deleteExtraRevenue(${i})">🗑</button></div>`; }
+            html += `</div><div class="add-cost-form"><input type="text" id="newRevenueName" class="add-cost-input" placeholder="Название (пожертвование, компенсация...)" autocomplete="off"><input type="number" id="newRevenueAmount" class="add-cost-input-number" placeholder="Сумма" value="0" step="100"><button class="add-cost-btn" onclick="addExtraRevenueFromModal()">➕ Добавить</button></div></div>`;
             container.innerHTML = html;
         }
         
@@ -4672,6 +5225,18 @@
             const amount = parseFloat(amountInput?.value);
             if (!name || isNaN(amount) || amount <= 0) { showToast("Введите название и сумму расхода", false); return; }
             addExtraCost(name, amount);
+            if (nameInput) nameInput.value = '';
+            if (amountInput) amountInput.value = '0';
+            renderStats();
+        }
+        
+        function addExtraRevenueFromModal() {
+            const nameInput = document.getElementById('newRevenueName');
+            const amountInput = document.getElementById('newRevenueAmount');
+            const name = nameInput?.value.trim();
+            const amount = parseFloat(amountInput?.value);
+            if (!name || isNaN(amount) || amount <= 0) { showToast("Введите название и сумму выручки", false); return; }
+            addExtraRevenue(name, amount);
             if (nameInput) nameInput.value = '';
             if (amountInput) amountInput.value = '0';
             renderStats();
@@ -4759,13 +5324,7 @@
                 if (s.hideStats === true && CURRENT_USER.role !== 'organizer') continue;
                 const profitClass = (s.netProfit || 0) >= 0 ? 'profit-positive' : 'profit-negative';
                 const marginClass = (s.profitMargin || 0) >= 0 ? 'profit-positive' : 'profit-negative';
-                html += `<tr><td>${escapeHtml(s.name)}</td><td>${s.role === 'organizer' ? 'Организатор' : 'Художник'}</td>
-                        <td class="text-right">${(s.totalRevenue || 0).toLocaleString()} ₽</td>
-                        <td class="text-right ${profitClass}">${(s.netProfit || 0).toLocaleString()} ₽</td>
-                        <td class="text-right">${(s.totalItemsSold || 0).toLocaleString()} шт</td>
-                        <td class="text-right">${(s.totalGoods || 0).toLocaleString()} шт</td>
-                        <td class="text-right">${(s.averageCheck || 0).toLocaleString()} ₽</td>
-                        <td class="text-right ${marginClass}">${(s.profitMargin || 0).toFixed(1)}%</td></tr>`;
+                html += `<tr><td class="text-right"></td><td class="text-right">${escapeHtml(s.name)}</td><td class="text-right">${s.role === 'organizer' ? 'Организатор' : 'Художник'}</td><td class="text-right">${(s.totalRevenue || 0).toLocaleString()} ₽</td><td class="text-right ${profitClass}">${(s.netProfit || 0).toLocaleString()} ₽</td><td class="text-right">${(s.totalItemsSold || 0).toLocaleString()} шт</td><td class="text-right">${(s.totalGoods || 0).toLocaleString()} шт</td><td class="text-right">${(s.averageCheck || 0).toLocaleString()} ₽</td><td class="text-right ${marginClass}">${(s.profitMargin || 0).toFixed(1)}%</td></tr>`;
             }
             html += `</tbody></table></div>`;
             
@@ -4774,11 +5333,7 @@
                 for (const t of data.typeDetails) {
                     const tProfitClass = (t.profit || 0) >= 0 ? 'profit-positive' : 'profit-negative';
                     const tMarginClass = (t.margin || 0) >= 0 ? 'profit-positive' : 'profit-negative';
-                    html += `<tr><td><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td>
-                            <td class="text-right">${t.qty} шт</td>
-                            <td class="text-right">${t.revenue.toLocaleString()} ₽</td>
-                            <td class="text-right ${tProfitClass}">${t.profit.toLocaleString()} ₽</td>
-                            <td class="text-right ${tMarginClass}">${t.margin.toFixed(1)}%</td></tr>`;
+                    html += `<tr><td class="text-right"><tr><td class="text-right"><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td><td class="text-right">${t.qty} шт</td><td class="text-right">${t.revenue.toLocaleString()} ₽</td><td class="text-right ${tProfitClass}">${t.profit.toLocaleString()} ₽</td><td class="text-right ${tMarginClass}">${t.margin.toFixed(1)}%</td></tr>`;
                 }
                 html += `</tbody></table></div>`;
             }
@@ -4789,13 +5344,7 @@
                     const p = data.topProducts[i];
                     const pProfitClass = (p.profit || 0) >= 0 ? 'profit-positive' : 'profit-negative';
                     const pMarginClass = (p.margin || 0) >= 0 ? 'profit-positive' : 'profit-negative';
-                    html += `<tr><td class="text-right"><span class="popular-badge">${i + 1}</span></td>
-                            <td>${escapeHtml(p.name)}</td>
-                            <td><span class="type-badge" style="background:${getTypeColor(p.type)}20; color:${getTypeColor(p.type)};">${escapeHtml(p.type)}</span></td>
-                            <td class="text-right">${p.qty} шт</td>
-                            <td class="text-right">${p.revenue.toLocaleString()} ₽</td>
-                            <td class="text-right ${pProfitClass}">${p.profit.toLocaleString()} ₽</td>
-                            <td class="text-right ${pMarginClass}">${p.margin.toFixed(1)}%</td></tr>`;
+                    html += `<tr><td class="text-right"><span class="popular-badge">${i + 1}</span></td><td class="text-right">${escapeHtml(p.name)}</td><td class="text-right"><span class="type-badge" style="background:${getTypeColor(p.type)}20; color:${getTypeColor(p.type)};">${escapeHtml(p.type)}</span></td><td class="text-right">${p.qty} шт</td><td class="text-right">${p.revenue.toLocaleString()} ₽</td><td class="text-right ${pProfitClass}">${p.profit.toLocaleString()} ₽</td><td class="text-right ${pMarginClass}">${p.margin.toFixed(1)}%</td></tr>`;
                 }
                 html += `</tbody></table></div>`;
             }
@@ -4806,12 +5355,7 @@
                     const t = data.topTypes[i];
                     const tProfitClass = (t.profit || 0) >= 0 ? 'profit-positive' : 'profit-negative';
                     const tMarginClass = (t.margin || 0) >= 0 ? 'profit-positive' : 'profit-negative';
-                    html += `<tr><td class="text-right"><span class="popular-badge">${i + 1}</span></td>
-                            <td><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td>
-                            <td class="text-right">${t.qty} шт</td>
-                            <td class="text-right">${t.revenue.toLocaleString()} ₽</td>
-                            <td class="text-right ${tProfitClass}">${t.profit.toLocaleString()} ₽</td>
-                            <td class="text-right ${tMarginClass}">${t.margin.toFixed(1)}%</td></tr>`;
+                    html += `<tr><td class="text-right"><span class="popular-badge">${i + 1}</span></td><td class="text-right"><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td><td class="text-right">${t.qty} шт</td><td class="text-right">${t.revenue.toLocaleString()} ₽</td><td class="text-right ${tProfitClass}">${t.profit.toLocaleString()} ₽</td><td class="text-right ${tMarginClass}">${t.margin.toFixed(1)}%</td></tr>`;
                 }
                 html += `</tbody></table></div>`;
             }
@@ -4871,11 +5415,11 @@
                     <div class="stats-card"><div class="stats-card-value">${(stats.averageCheck || 0).toLocaleString()} ₽</div><div class="stats-card-label">💳 Средний чек</div></div></div>
                 <div class="stats-summary-compact"><div class="stats-summary-value ${marginClass}">${(stats.profitMargin || 0).toFixed(1)}%</div><div class="stats-summary-label">Рентабельность продаж</div></div>`;
             if (stats.productDetails && stats.productDetails.length > 0) {
-                html += `<div class="detail-section"><div class="detail-title">📦 Детализация по товарам</div><table class="detail-table"><thead><tr><th>Товар</th><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th></tr></thead><tbody>`;
+                html += `<div class="detail-section"><div class="detail-title">📦 Детализация по товарам</div><table class="detail-table"><thead><tr><th>Товар</th><th>Тип</th><th class="text-right">Кол-во</th><th class="text-right">Выручка</th><th class="text-right">Прибыль</th><th class="text-right">Рентаб.</th><tr></thead><tbody>`;
                 for (const p of stats.productDetails) {
                     const pProfitClass = (p.profit || 0) >= 0 ? 'profit-positive' : 'profit-negative';
                     const pMarginClass = (p.margin || 0) >= 0 ? 'profit-positive' : 'profit-negative';
-                    html += `<tr><td class="text-right"></td><td>${escapeHtml(p.name)}</td><td><span class="type-badge" style="background:${getTypeColor(p.type)}20; color:${getTypeColor(p.type)};">${escapeHtml(p.type)}</span></td><td class="text-right">${p.qty} шт</td><td class="text-right">${p.revenue.toLocaleString()} ₽</td><td class="text-right ${pProfitClass}">${p.profit.toLocaleString()} ₽</td><td class="text-right ${pMarginClass}">${p.margin.toFixed(1)}%</td></tr>`;
+                    html += `<tr><td class="text-right"><td>${escapeHtml(p.name)}</td><td class="text-right"><span class="type-badge" style="background:${getTypeColor(p.type)}20; color:${getTypeColor(p.type)};">${escapeHtml(p.type)}</span></td><td class="text-right">${p.qty} шт</td><td class="text-right">${p.revenue.toLocaleString()} ₽</td><td class="text-right ${pProfitClass}">${p.profit.toLocaleString()} ₽</td><td class="text-right ${pMarginClass}">${p.margin.toFixed(1)}%</td></tr>`;
                 }
                 html += `</tbody></table></div>`;
             }
@@ -4884,7 +5428,7 @@
                 for (const t of stats.typeDetails) {
                     const tProfitClass = (t.profit || 0) >= 0 ? 'profit-positive' : 'profit-negative';
                     const tMarginClass = (t.margin || 0) >= 0 ? 'profit-positive' : 'profit-negative';
-                    html += `<tr><td><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td><td class="text-right">${t.qty} шт</td><td class="text-right">${t.revenue.toLocaleString()} ₽</td><td class="text-right ${tProfitClass}">${t.profit.toLocaleString()} ₽</td><td class="text-right ${tMarginClass}">${t.margin.toFixed(1)}%</td></tr>`;
+                    html += `<tr><td class="text-right"><span class="type-badge" style="background:${getTypeColor(t.type)}20; color:${getTypeColor(t.type)};">${escapeHtml(t.type)}</span></td><td class="text-right">${t.qty} шт</td><td class="text-right">${t.revenue.toLocaleString()} ₽</td><td class="text-right ${tProfitClass}">${t.profit.toLocaleString()} ₽</td><td class="text-right ${tMarginClass}">${t.margin.toFixed(1)}%</td></tr>`;
                 }
                 html += `</tbody></table></div>`;
             }
@@ -4899,13 +5443,14 @@
             if (cartItems.length === 0 || !originalCardsData.length) return [];
             const cartInfo = {};
             let totalPrice = 0;
-            for (const [idxStr, qty] of cartItems) {
+            for (const [idStr, qty] of cartItems) {
                 if (qty === 0) continue;
-                const idx = parseInt(idxStr);
-                const card = originalCardsData[idx];
+                const id = parseInt(idStr);
+                const card = originalCardsData.find(c => c.id === id);
                 if (card) {
-                    if (!cartInfo[card.name]) cartInfo[card.name] = { qty: 0, price: card.price, type: card.type };
-                    cartInfo[card.name].qty += qty;
+                    const displayName = `[${card.type}] ${card.name}`;
+                    if (!cartInfo[displayName]) cartInfo[displayName] = { qty: 0, price: card.price, type: card.type };
+                    cartInfo[displayName].qty += qty;
                     totalPrice += qty * card.price;
                 }
             }
@@ -4977,11 +5522,64 @@
             filterAndSort();
         }
         
+        async function saveProductChanges() {
+            const productId = parseInt(document.getElementById('editId').value);
+            const newName = document.getElementById('editName').value.trim();
+            const newType = document.getElementById('editType').value.trim();
+            const newTotal = parseInt(document.getElementById('editTotal').value);
+            const newStock = parseInt(document.getElementById('editStock').value);
+            const oldCard = originalCardsData.find(c => c.id === productId);
+            if (!oldCard) { showToast("Товар не найден", false); return; }
+            if (isNaN(newTotal) || isNaN(newStock) || newTotal < 0 || newStock < 0 || newStock > newTotal) {
+                showToast("Некорректные значения", false);
+                return;
+            }
+            
+            if (!isOnline) {
+                addPendingOperation("updateProduct", `&id=${productId}&name=${encodeURIComponent(newName)}&type=${encodeURIComponent(newType)}&total=${newTotal}&stock=${newStock}&oldId=${productId}&oldName=${encodeURIComponent(oldCard.name)}&oldType=${encodeURIComponent(oldCard.type)}`);
+                oldCard.name = newName;
+                oldCard.type = newType;
+                oldCard.total = newTotal;
+                oldCard.stock = newStock;
+                filterAndSort();
+                showToast(`Товар обновлён (будет синхронизировано при восстановлении соединения)`, true);
+                closeEditProductModal();
+                return;
+            }
+            
+            try {
+                const response = await fetch(buildApiUrl("updateProduct", `&id=${productId}&name=${encodeURIComponent(newName)}&type=${encodeURIComponent(newType)}&total=${newTotal}&stock=${newStock}&oldId=${productId}&oldName=${encodeURIComponent(oldCard.name)}&oldType=${encodeURIComponent(oldCard.type)}`));
+                const result = await response.json();
+                if (result.success) {
+                    oldCard.name = newName;
+                    oldCard.type = newType;
+                    oldCard.total = newTotal;
+                    oldCard.stock = newStock;
+                    filterAndSort();
+                    showToast(`Товар "${newName}" обновлён`, true);
+                    closeEditProductModal();
+                    loadBookings();
+                } else {
+                    showToast("Ошибка обновления", false);
+                }
+            } catch(e) {
+                addPendingOperation("updateProduct", `&id=${productId}&name=${encodeURIComponent(newName)}&type=${encodeURIComponent(newType)}&total=${newTotal}&stock=${newStock}&oldId=${productId}&oldName=${encodeURIComponent(oldCard.name)}&oldType=${encodeURIComponent(oldCard.type)}`);
+                oldCard.name = newName;
+                oldCard.type = newType;
+                oldCard.total = newTotal;
+                oldCard.stock = newStock;
+                filterAndSort();
+                showToast(`Товар обновлён (будет синхронизировано при восстановлении соединения)`, true);
+                closeEditProductModal();
+            }
+        }
+        
         function initApp() {
             initCustomSelects();
             loadRules();
             loadHistory();
             loadExtraCosts();
+            loadExtraRevenues();
             if (CURRENT_USER.role === 'organizer') loadGlobalExtraCosts();
             initDateTimeSelects();
             bindDateTimeEvents();
@@ -4989,15 +5587,18 @@
             loadData(true, true);
             startAutoRefresh();
             startHistoryAutoSync();
+            
             const settingsToggle = document.getElementById('settingsToggle');
             const settingsDropdown = document.getElementById('settingsDropdown');
             const shareStatsBtn = document.getElementById('shareStatsBtn');
             const hideStatsBtn = document.getElementById('hideStatsBtn');
             const logoutBtn = document.getElementById('logoutBtn');
+            const bookingBtn = document.getElementById('bookingButton');
             if (settingsToggle) { settingsToggle.addEventListener('click', (e) => { e.stopPropagation(); settingsDropdown.classList.toggle('hidden'); }); }
             if (shareStatsBtn) { shareStatsBtn.addEventListener('click', () => { toggleShareStats(); settingsDropdown.classList.add('hidden'); }); }
             if (hideStatsBtn) { hideStatsBtn.addEventListener('click', () => { toggleHideStats(); settingsDropdown.classList.add('hidden'); }); }
             if (logoutBtn) { logoutBtn.addEventListener('click', () => { logout(); settingsDropdown.classList.add('hidden'); }); }
+            if (bookingBtn) { bookingBtn.addEventListener('click', () => { openBookingModal(); }); }
             document.addEventListener('click', (e) => { if (settingsDropdown && !settingsToggle?.contains(e.target) && !settingsDropdown.contains(e.target)) settingsDropdown.classList.add('hidden'); });
         }
         
@@ -5010,6 +5611,7 @@
             if (event.target === document.getElementById('statsModal')) closeStatsModal();
             if (event.target === document.getElementById('globalStatsModal')) closeGlobalStatsModal();
             if (event.target === document.getElementById('editProductModal')) closeEditProductModal();
+            if (event.target === document.getElementById('bookingModal')) closeBookingModal();
         };
         
         document.addEventListener('DOMContentLoaded', () => {
